@@ -50,12 +50,15 @@ def game():
                 if 200 < (cartpol.x_table - 3):
                         #Manuall:
                         if pressed[pygame.K_LEFT]:
-                                x -= 3
+                                cartpol.x_table -= 3
+                                cartpol.x_stick -= 3
                 if 600 > (cartpol.x_table + 3):
                         # Manuall:
                         if pressed[pygame.K_RIGHT]:
-                                x += 3
+                                cartpol.x_table += 3
+                                cartpol.x_stick += 3
+                screen.fill((0, 0, 0))
                 redrawScreen(cartpol)
                 pygame.display.flip()
-                clock.tick(6)
+                clock.tick(60)
 game()
