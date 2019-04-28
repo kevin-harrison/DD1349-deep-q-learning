@@ -56,7 +56,7 @@ class CartPole():
                 self.dx = self.euler(self.dx, self.d2x)
 
                 # Getting the angle in the right intervall and startvalue:
-                angle = self.theta + math.pi 
+                angle = -self.theta + math.pi 
                 if angle > 0:
                         angle = angle - 2*math.pi * math.ceil(angle/(2*math.pi))
                         angle = math.fmod(angle-math.pi, 2*math.pi) + math.pi
@@ -74,9 +74,9 @@ class CartPole():
         #Assigning a force on the table:
         def action(self, act): 
                 if act == 1:
-                        self.motor_force= -100.0
+                        self.motor_force= 100.0
                 elif act == 0:
-                        self.motor_force = 100.0
+                        self.motor_force = -100.0
                 self.step(act)
                 
 # The main loop that keeps the game running:
@@ -90,20 +90,20 @@ def game():
                 # Game exit:
                 for event in pygame.event.get():
                         if event.type == pygame.QUIT:
-                                done = True
+                                pygame.quit()
                 pressed = pygame.key.get_pressed()
                 
                 #Fail properties left-side of path:
-                if (200 > (cartpol.x_table - 3) or cartpol.y_stick > 600) and not done:
+                if (200 > (cartpol.x_table - 3) or cartpol.y_stick > 600):
                         game()
                 if pressed[pygame.K_LEFT]:
-                        right_or_left = 1
+                        right_or_left = 0
                         
                 #Fail properties right-side of path:
-                if (600 - cartpol.tableWidth < (cartpol.x_table + 3) or cartpol.y_stick > 600) and not done:
+                if (600 - cartpol.tableWidth < (cartpol.x_table + 3) or cartpol.y_stick > 600):
                         game()
                 if pressed[pygame.K_RIGHT]:
-                        right_or_left = 0
+                        right_or_left = 1
                         
                 # Reseting screen:
                 screen.fill(WHITE)
