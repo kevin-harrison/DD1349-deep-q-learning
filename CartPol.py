@@ -8,11 +8,12 @@ WHITE = (255,255,255)
 BROWN = (98, 78, 44)
 BLACK = (0,0,0)
 
+
 class CartPole():
         def __init__(self):
                 
                 #Generall properties:
-                self.totalMass = 1.1
+                self.totalMass = 1.5
                 self.gravity = 9.8
                 self.x = 400.0
                 self.y = 600.0
@@ -22,11 +23,11 @@ class CartPole():
                 self.dtheta = 0.0
                 self.d2theta = 0.0
                 self.eulerStep = 0.01
-                self.motor_force = 10.0
+                self.motor_force = 100.0
                 #Stick properties:
                 self.stickWidth = 3
                 self.stickHeight = 70
-                self.stickMass = 0.1
+                self.stickMass = 0.5
                 self.x_stick = self.x -1.5
                 self.y_stick = self.y - 70
                 #Table properties:
@@ -41,24 +42,22 @@ class CartPole():
         def draw(self, screen):
                 pygame.draw.rect(screen, BROWN, pygame.Rect(self.x_stick, self.y_stick, self.stickWidth, self.stickHeight))
                 pygame.draw.rect(screen, BLACK, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
-        def step(self):
+        def step(self, act):
                 costheta = math.cos(self.theta)
                 sintheta = math.sin(self.theta)
                 #Physics relation between stick and table:
                 self.dtheta =self.d2theta
-                self.d2theta = (self.gravity * sintheta + costheta*((- self.motor_force - self.stickMass*self.stickHeight*((self.dtheta)**2)*sintheta)/(self.totalMass))/self.stickHeight*(4/3 - self.stickMass*costheta**2/self.totalMass))
+                self.d2theta = (self.gravity * sintheta + costheta*((-self.motor_force - self.stickMass*self.stickHeight*((self.dtheta)**2)*sintheta)/(self.totalMass))/self.stickHeight*(4/3 - self.stickMass*costheta**2/self.totalMass))
                 self.dx = self.d2x
                 self.d2x = (self.motor_force + self.stickMass*self.stickHeight*(sintheta*self.dtheta**2 - self.d2theta*costheta))/self.totalMass
-                self.theta = self.euler(self.theta, self.dtheta)
+                self.theta = self.euler(self.theta, self.dtheta) + math.pi
                 self.dtheta = self.euler(self.dtheta, self.d2theta)                
                 self.x = self.euler(self.x, self.dx)
                 self.dx = self.euler(self.dx, self.d2x)
-                if self.theta > 0:
-                        self.x_stick = self.x_stick + self.stickHeight*math.sin(self.theta)
-                        self.y_stick = self.y_stick + self.stickHeight*math.cos(self.theta)
-                if self.theta < 0:
-                        self.x_stick = self.x_stick - self.stickHeight*math.sin(self.theta)
-                        self.y_stick = self.y_stick - self.stickHeight*math.cos(self.theta)
+                self.x_stick = self.x + self.stickHeight*math.sin(self.theta)
+                self.y_stick = self.y + self.stickHeight*math.cos(self.theta)
+                self.x_table = self.x -25
+                self.y_table = self.y -5
                 self.draw(screen)
 
                 
@@ -69,17 +68,17 @@ class CartPole():
         
         def action(self, act): 
                 if act == 1:
-                        self.d2x = self.motor_force/self.totalMass
-                elif act == 0:
                         self.d2x = -self.motor_force/self.totalMass
+                elif act == 0:
+                        self.d2x = self.motor_force/self.totalMass
                 self.dx = self.d2x*self.acc_time
-                self.step()
+                self.step(act)
 
 def game():
-        done = False
         cartpol = CartPole()
         num_runs= 0
         right_or_left = random.randint(0,1)
+        done = False
         
         while not done:
                 num_runs += 1
