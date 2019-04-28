@@ -5,32 +5,68 @@ screen = pygame.display.set_mode((800, 800))
 pygame.init()
 clock = pygame.time.Clock()
 WHITE = (255,255,255)
-GREEN = (0,255,0)
+BROWN = (98, 78, 44)
 BLACK = (0,0,0)
 
 class CartPole():
         def __init__(self):
-                #Stick properties:
-                self.stickWidth = 3
-                self.stickHeight = 70
-                self.stickMass = 0.1
-                self.x_stick = 400 -1.5
-                self.y_stick = 600 - 70
-                #Table properties:
-                self.tableWidth = 50
-                self.tableHeight = 10
-                self.tableMass = 1
-                self.x_table = 400-25
-                self.y_table = 600-5
-                #Movement properties:
                 
                 #Generall properties:
                 self.totalMass = 1.1
                 self.gravity = 9.8
+                self.x = 400.0
+                self.y = 600.0
+                self.dx = 0.0
+                self.d2x = 0.0
+                self.theta = 0.0
+                self.dtheta = 0.0
+                self.d2theta = 0.0
+                self.eulerStep = 0.01
+                self.motor_force = 10.0
+                #Stick properties:
+                self.stickWidth = 3
+                self.stickHeight = 70
+                self.stickMass = 0.1
+                self.x_stick = self.x -1.5
+                self.y_stick = self.y - 70
+                #Table properties:
+                self.tableWidth = 50
+                self.tableHeight = 10
+                self.tableMass = 1
+                self.x_table = self.x -25
+                self.y_table = self.y -5
+                #Fail properties:
                 
         def draw(self, screen):
-                pygame.draw.rect(screen, GREEN, pygame.Rect(self.x_stick, self.y_stick, self.stickWidth, self.stickHeight))
+                pygame.draw.rect(screen, BROWN, pygame.Rect(self.x_stick, self.y_stick, self.stickWidth, self.stickHeight))
                 pygame.draw.rect(screen, BLACK, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
+        def step(self):
+                costheta = math.cos(self.theta)
+                sintheta = math.sin(self.theta)
+                #Physics relation between stick and table:
+                self.dtheta =self.d2theta
+                self.d2theta = (self.gravity * sintheta + costheta*((- self.motor_force - self.stickMass*self.stickHeight*((self.dtheta)**2)*sintheta)/(self.totalMass))/self.stickHeight*(4/3 - self.stickMass*costheta**2/self.totalMass))
+                self.dx = self.d2x
+                self.d2x = (self.motor_force + self.stickMass*self.stickHeight*(sintheta*self.dtheta**2 - self.d2theta*costheta))/self.totalMass
+                self.theta = self.euler(self.theta, self.dtheta)
+                self.dtheta = self.euler(self.dtheta, self.d2theta)
+                self.x = self.euler(self.x, self.dx)
+                self.dx = self.euler(self.dx, self.d2x)
+                
+                #Eulers fomula with one step:
+        def euler(self, value, dvalue):
+                value = value + self.eulerStep*dvalue
+                return value 
+        
+        def action(self, act): 
+                if act == 1:
+                        self.d2x = self.motor_force/self.totalMass
+                elif act == 0:
+                        self.d2x = -self.motor_force/self.totalMass
+                self.step()
+                
+
+                        
                 
 def redrawScreen(cartpol):
       cartpol.draw(screen)
@@ -39,8 +75,11 @@ def redrawScreen(cartpol):
 def game():
         done = False
         cartpol = CartPole()
+        num_runs= 0
+        right_or_left = random.randint(0,1)
         
         while not done:
+                num_runs += 1
                 for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                                 done = True
@@ -49,16 +88,17 @@ def game():
                 if 200 < (cartpol.x_table - 3):
                         #Manuall:
                         if pressed[pygame.K_LEFT]:
-                                cartpol.x_table -= 3
-                                cartpol.x_stick -= 3
+                                right_or_left = 1
                 if 600 - cartpol.tableWidth > (cartpol.x_table + 3):
                         # Manuall:
                         if pressed[pygame.K_RIGHT]:
-                                cartpol.x_table += 3
-                                cartpol.x_stick += 3
+                                right_or_left = 0
+                
                 screen.fill(WHITE)
+                cartpol.action(right_or_left)
                 redrawScreen(cartpol)
                 path = pygame.draw.line(screen, BLACK, (200,600), (600,600), 1)
                 pygame.display.flip()
                 clock.tick(60)
-game()
+if __name__ == "__main__":
+    game()
