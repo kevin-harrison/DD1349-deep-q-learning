@@ -13,7 +13,7 @@ class CartPole():
         def __init__(self):
                 
                 #Generall properties:
-                self.totalMass = 1.5
+                self.totalMass = 1.1
                 self.gravity = 9.8
                 self.x = 400.0
                 self.y = 600.0
@@ -22,12 +22,12 @@ class CartPole():
                 self.theta = 0.0
                 self.dtheta = 0.0
                 self.d2theta = 0.0
-                self.eulerStep = 0.01
-                self.motor_force = 100.0
+                self.eulerStep = 0.02
+                self.motor_force = 0
                 #Stick properties:
                 self.stickWidth = 3
                 self.stickHeight = 70
-                self.stickMass = 0.5
+                self.stickMass = 0.1
                 self.x_stick = self.x -1.5
                 self.y_stick = self.y - 70
                 #Table properties:
@@ -37,43 +37,49 @@ class CartPole():
                 self.acc_time = 0.2
                 self.x_table = self.x -25
                 self.y_table = self.y -5
-                #Fail properties:
                 
         def draw(self, screen):
-                pygame.draw.rect(screen, BROWN, pygame.Rect(self.x_stick, self.y_stick, self.stickWidth, self.stickHeight))
+                pygame.draw.line(screen, BROWN, (self.x, self.y), (self.x_stick, self.y_stick), 3)
                 pygame.draw.rect(screen, BLACK, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
         def step(self, act):
                 costheta = math.cos(self.theta)
                 sintheta = math.sin(self.theta)
-                #Physics relation between stick and table:
-                self.dtheta =self.d2theta
-                self.d2theta = (self.gravity * sintheta + costheta*((-self.motor_force - self.stickMass*self.stickHeight*((self.dtheta)**2)*sintheta)/(self.totalMass))/self.stickHeight*(4/3 - self.stickMass*costheta**2/self.totalMass))
-                self.dx = self.d2x
-                self.d2x = (self.motor_force + self.stickMass*self.stickHeight*(sintheta*self.dtheta**2 - self.d2theta*costheta))/self.totalMass
-                self.theta = self.euler(self.theta, self.dtheta) + math.pi
+                #ODE-system implementation for solving differential equations in FormulasForSolvingSystem.PNG:
+                temp = (self.motor_force + self.stickMass*0.5 * self.dtheta * self.dtheta * sintheta) / self.totalMass
+                self.d2theta = (self.gravity * sintheta - costheta* temp) / (self.stickHeight * (4.0/3.0 - self.stickMass * costheta * costheta / self.totalMass))
+                self.d2x = temp - self.stickMass*0.5*self.d2theta*costheta / self.totalMass
+
+                #Getting the state of the object using eulers method:
+                self.theta = self.euler(self.theta, self.dtheta)
                 self.dtheta = self.euler(self.dtheta, self.d2theta)                
                 self.x = self.euler(self.x, self.dx)
                 self.dx = self.euler(self.dx, self.d2x)
-                self.x_stick = self.x + self.stickHeight*math.sin(self.theta)
-                self.y_stick = self.y + self.stickHeight*math.cos(self.theta)
+
+                # Getting the angle in the right intervall and startvalue:
+                angle = self.theta + math.pi 
+                if angle > 0:
+                        angle = angle - 2*math.pi * math.ceil(angle/(2*math.pi))
+                        angle = math.fmod(angle-math.pi, 2*math.pi) + math.pi
+                self.y_stick = self.y + self.stickHeight*math.cos(angle)
+                self.x_stick = self.x + self.stickHeight*math.sin(angle)
                 self.x_table = self.x -25
-                self.y_table = self.y -5
                 self.draw(screen)
 
                 
-                #Eulers fomula with one step:
+        #Eulers fomula with one step:
         def euler(self, value, dvalue):
                 value = value + self.eulerStep*dvalue
-                return value 
+                return value
         
+        #Assigning a force on the table:
         def action(self, act): 
                 if act == 1:
-                        self.d2x = -self.motor_force/self.totalMass
+                        self.motor_force= -100.0
                 elif act == 0:
-                        self.d2x = self.motor_force/self.totalMass
-                self.dx = self.d2x*self.acc_time
+                        self.motor_force = 100.0
                 self.step(act)
-
+                
+# The main loop that keeps the game running:
 def game():
         cartpol = CartPole()
         num_runs= 0
@@ -81,25 +87,31 @@ def game():
         done = False
         
         while not done:
-                num_runs += 1
+                # Game exit:
                 for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                                 done = True
                 pressed = pygame.key.get_pressed()
-                # Boundaries and movement
-                if 200 < (cartpol.x_table - 3):
-                        #Manuall:
-                        if pressed[pygame.K_LEFT]:
-                                right_or_left = 1
-
-                if 600 - cartpol.tableWidth > (cartpol.x_table + 3):
-                        # Manuall:
-                        if pressed[pygame.K_RIGHT]:
-                                right_or_left = 0
-
                 
+                #Fail properties left-side of path:
+                if (200 > (cartpol.x_table - 3) or cartpol.y_stick > 600) and not done:
+                        game()
+                if pressed[pygame.K_LEFT]:
+                        right_or_left = 1
+                        
+                #Fail properties right-side of path:
+                if (600 - cartpol.tableWidth < (cartpol.x_table + 3) or cartpol.y_stick > 600) and not done:
+                        game()
+                if pressed[pygame.K_RIGHT]:
+                        right_or_left = 0
+                        
+                # Reseting screen:
                 screen.fill(WHITE)
+                myfont = pygame.font.SysFont("space", 40)
+                label = myfont.render("number runs: " + str(num_runs), 1, (BLACK))
+                screen.blit(label, (320, 700))
                 cartpol.action(right_or_left)
+                num_runs += 1
                 path = pygame.draw.line(screen, BLACK, (200,600), (600,600), 1)
                 pygame.display.flip()
                 clock.tick(60)
