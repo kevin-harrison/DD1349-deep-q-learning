@@ -33,6 +33,7 @@ class CartPole():
                 self.tableWidth = 50
                 self.tableHeight = 10
                 self.tableMass = 1
+                self.acc_time = 0.2
                 self.x_table = self.x -25
                 self.y_table = self.y -5
                 #Fail properties:
@@ -49,9 +50,17 @@ class CartPole():
                 self.dx = self.d2x
                 self.d2x = (self.motor_force + self.stickMass*self.stickHeight*(sintheta*self.dtheta**2 - self.d2theta*costheta))/self.totalMass
                 self.theta = self.euler(self.theta, self.dtheta)
-                self.dtheta = self.euler(self.dtheta, self.d2theta)
+                self.dtheta = self.euler(self.dtheta, self.d2theta)                
                 self.x = self.euler(self.x, self.dx)
                 self.dx = self.euler(self.dx, self.d2x)
+                if self.theta > 0:
+                        self.x_stick = self.x_stick + self.stickHeight*math.sin(self.theta)
+                        self.y_stick = self.y_stick + self.stickHeight*math.cos(self.theta)
+                if self.theta < 0:
+                        self.x_stick = self.x_stick - self.stickHeight*math.sin(self.theta)
+                        self.y_stick = self.y_stick - self.stickHeight*math.cos(self.theta)
+                self.draw(screen)
+
                 
                 #Eulers fomula with one step:
         def euler(self, value, dvalue):
@@ -63,14 +72,8 @@ class CartPole():
                         self.d2x = self.motor_force/self.totalMass
                 elif act == 0:
                         self.d2x = -self.motor_force/self.totalMass
+                self.dx = self.d2x*self.acc_time
                 self.step()
-                
-
-                        
-                
-def redrawScreen(cartpol):
-      cartpol.draw(screen)
-      
 
 def game():
         done = False
@@ -89,14 +92,15 @@ def game():
                         #Manuall:
                         if pressed[pygame.K_LEFT]:
                                 right_or_left = 1
+
                 if 600 - cartpol.tableWidth > (cartpol.x_table + 3):
                         # Manuall:
                         if pressed[pygame.K_RIGHT]:
                                 right_or_left = 0
+
                 
                 screen.fill(WHITE)
                 cartpol.action(right_or_left)
-                redrawScreen(cartpol)
                 path = pygame.draw.line(screen, BLACK, (200,600), (600,600), 1)
                 pygame.display.flip()
                 clock.tick(60)
