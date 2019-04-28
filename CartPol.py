@@ -27,11 +27,10 @@ class CartPole():
                 #Generall properties:
                 self.totalMass = 1.1
                 self.gravity = 9.8
-                self.path = 400
                 
         def draw(self, screen):
                 pygame.draw.rect(screen, GREEN, pygame.Rect(self.x_stick, self.y_stick, self.stickWidth, self.stickHeight))
-                pygame.draw.rect(screen, WHITE, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
+                pygame.draw.rect(screen, BLACK, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
                 
 def redrawScreen(cartpol):
       cartpol.draw(screen)
@@ -52,13 +51,14 @@ def game():
                         if pressed[pygame.K_LEFT]:
                                 cartpol.x_table -= 3
                                 cartpol.x_stick -= 3
-                if 600 > (cartpol.x_table + 3):
+                if 600 - cartpol.tableWidth > (cartpol.x_table + 3):
                         # Manuall:
                         if pressed[pygame.K_RIGHT]:
                                 cartpol.x_table += 3
                                 cartpol.x_stick += 3
-                screen.fill((0, 0, 0))
+                screen.fill(WHITE)
                 redrawScreen(cartpol)
+                path = pygame.draw.line(screen, BLACK, (200,600), (600,600), 1)
                 pygame.display.flip()
                 clock.tick(60)
 game()
