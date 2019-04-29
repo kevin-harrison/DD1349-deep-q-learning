@@ -91,6 +91,8 @@ def game():
                 for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                                 done = True
+                                pygame.quit()
+                                
                 pressed = pygame.key.get_pressed()
                 
                 #Fail properties left-side of path:
