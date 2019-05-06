@@ -1,14 +1,6 @@
-import pygame
+
 import math
 import random
-import NeuralNetwork
-screen = pygame.display.set_mode((800, 800))
-pygame.init()
-clock = pygame.time.Clock()
-WHITE = (255,255,255)
-BROWN = (98, 78, 44)
-BLACK = (0,0,0)
-complete_data = []
 
 
 class CartPole():
@@ -66,7 +58,6 @@ class CartPole():
                 self.y_stick = self.y + self.stickHeight*math.cos(angle)
                 self.x_stick = self.x + self.stickHeight*math.sin(angle)
                 self.x_table = self.x -25
-                self.draw_position(screen)
 
                 
         #Eulers fomula with one step:
@@ -77,49 +68,28 @@ class CartPole():
         #Assigning a force on the table:
         def action(self, act): 
                 if act == 1:
-                        self.motor_force= 1000.0
+                        self.motor_force= 300.0
                 elif act == 0:
-                        self.motor_force = -1000.0
+                        self.motor_force = -300.0
                 self.step(act)
-                
-        def position_returning(self):
-            return self.theta, self.x
 
 
+
+        #Methods used for the creation of the q-learning algorithm.  
+        def random_state(self):
                 
-# The main loop that keeps the game running:
-def AI_training():
-    
-        cartpol = CartPole()
-        network = NeuralNetwork([2,3,2])
-        num_runs= 0
-        done = False
-        information_of_runs = []
-        
-        while not done:
-                # Game exit:
-                for event in pygame.event.get():
-                        if event.type == pygame.QUIT or number_of_training_runs == 50:
-                                pygame.quit()
-                theta,x = cartpol.position_returning()
-                network.SGD([theta,x], 100, 0.8)
-                # Decision making here should be implemented, input is the theta and x value. Output is either 0 or 1.
-                # right_or_left = whatever is returned by the neural network and q-earning algorithm.
-                #Fail properties left-side of path:
+                self.x=(random.randrange(0,401) + 200)
+                self.theta=(random.randrange(-pi/4, -pi/4))
+                self.dx=(random.randrange(-360,360))
+                self.dtheta=(random.randrange(-3.17, 3.17))
+
+        def get_newState_and_reward(self, act):
+                action(act)
+                reward = 1
                 if (200 > (cartpol.x_table - 3) or cartpol.y_stick > 580):
-                    information_of_runs.append(num_runs)
-                    AI_training()
-                        
-                #Fail properties right-side of path:
+                        reward = 0 # reward zero means that we have breaken the boundaries.
                 if (600 - cartpol.tableWidth < (cartpol.x_table + 3) or cartpol.y_stick > 580):
-                    information_of_runs.append(num_runs)
-                    AI_training()
-                        
-                screen.fill(WHITE) # Reseting screen
-                cartpol.action(right_or_left) # Applying the force in the cartpol.
-                num_runs += 1 # Points scored this round.
-                path = pygame.draw.line(screen, BLACK, (200,600), (600,600), 1) # Path drawing.
-                pygame.display.update()
-                clock.tick(60)
-if __name__ == "__main__":
-    AI_training()
+                        reward = 0 # reward zero means that we have breaken the boundaries.
+                # State is provided by the x position(1), x-velocity(2), theta(3) and theta-velocity(4).
+                state = [self.x, self.dx, self.theta, self.dtheta]
+                return reward, state
