@@ -11,7 +11,7 @@ BLACK = (0,0,0)
 
 class CartPole():
         def __init__(self):
-                
+
                 #Generall properties:
                 self.totalMass = 1.1
                 self.gravity = 9.8
@@ -37,10 +37,14 @@ class CartPole():
                 self.acc_time = 0.2
                 self.x_table = self.x -25
                 self.y_table = self.y -5
+<<<<<<< HEAD
                 #Trials for limits:
                 self.dxtrial = 0
                 self.dthetatrial = 0
                 
+=======
+
+>>>>>>> e95ae9ab492e31c720d70cb9b5d0fb383762c77c
         def draw(self, screen):
                 print(self.theta)     
                 pygame.draw.line(screen, BROWN, (self.x, self.y), (self.x_stick, self.y_stick), 3)
@@ -55,12 +59,12 @@ class CartPole():
 
                 #Getting the state of the object using eulers method:
                 self.theta = self.euler(self.theta, self.dtheta)
-                self.dtheta = self.euler(self.dtheta, self.d2theta)                
+                self.dtheta = self.euler(self.dtheta, self.d2theta)
                 self.x = self.euler(self.x, self.dx)
                 self.dx = self.euler(self.dx, self.d2x)
 
                 # Getting the angle in the right intervall and startvalue:
-                angle = -self.theta + math.pi 
+                angle = -self.theta + math.pi
                 if angle > 0:
                         angle = angle - 2*math.pi * math.ceil(angle/(2*math.pi))
                         angle = math.fmod(angle-math.pi, 2*math.pi) + math.pi
@@ -69,35 +73,40 @@ class CartPole():
                 self.x_table = self.x -25
                 self.draw(screen)
 
-                
+
         #Eulers fomula with one step:
         def euler(self, value, dvalue):
                 value = value + self.eulerStep*dvalue
                 return value
-        
+
         #Assigning a force on the table:
-        def action(self, act): 
+        def action(self, act):
                 if act == 1:
                         self.motor_force= 300.0
                 elif act == 0:
                         self.motor_force = -300.0
                 self.step(act)
+<<<<<<< HEAD
   
     
+=======
+
+>>>>>>> e95ae9ab492e31c720d70cb9b5d0fb383762c77c
 # The main loop that keeps the game running:
 def game():
         cartpol = CartPole()
         num_runs= 0
         right_or_left = 2
         done = False
-        
+
         while not done:
                 # Game exit:
                 for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                                 pygame.quit()
+
                 pressed = pygame.key.get_pressed()
-                
+
                 #Fail properties left-side of path:
                 if (200 > (cartpol.x_table - 3) or cartpol.y_stick > 600):
                         print('x accel:')
@@ -107,7 +116,7 @@ def game():
                         game()
                 if pressed[pygame.K_LEFT]:
                         right_or_left = 0
-                        
+
                 #Fail properties right-side of path:
                 if (600 - cartpol.tableWidth < (cartpol.x_table + 3) or cartpol.y_stick > 600):
                         print('x accel:')
@@ -117,7 +126,7 @@ def game():
                         game()
                 if pressed[pygame.K_RIGHT]:
                         right_or_left = 1
-                        
+
                 # Reseting screen:
                 screen.fill(WHITE)
                 myfont = pygame.font.SysFont("space", 40)

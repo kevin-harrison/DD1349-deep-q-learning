@@ -73,7 +73,7 @@ class ReinforcementLearner:
 # Example
 rl = ReinforcementLearner()
 rl.print()
-for i in range(20):
+for i in range(100):
     print("EPISODE", i+1)
     rl.episode()
     print("Current policy:")
