@@ -35,24 +35,42 @@ class DeepLearner(object):
         # Get starting state
         state = self.environment.random_state()
         
-        for i in range(50): # 50?
+        for i in range(100): # 100? # TODO: train more if we break before 100?
 
             # Populate memory replay
-            while(len(self.memory_replay) < 10000):
-                state_transistion = get_state_transition()
-                self.memory_replay.append(state_transistion)
+            while(len(self.memory_replay) < 2000):
+                state_transistion = get_state_transition(state, i)
+                self.memory_replay.append(state_transition)
+                if state_transition[4] == True:
+                    state = self.environment.random_state()
+                else:
+                    state = state_transition[3]
+                    
+            # Add transition to memory
+            state_transistion = get_state_transition(state, i)
+            self.memory_replay.append(state_transistion)
+            self.memory_replay.pop(0) # INEFFICIENT
             
+            # Train minibatch
+            minibatch = random.sample(self.memory_replay, 64)
+            for state, action, reward, next_state, is_end_state in minibatch:
+                target = reward
+                prediction = self.q_network.feedforward(next_state) # TODO: use frozen network for prediction
+                if not is_end_state:
+                    target = reward + self.discount_factor * max(prediction)
 
-            # Get minibatch
-
-
+                target_vector = prediction
+                target_vector[action] = target
+                self.q_network.train(state, target_vector)
+                    
             # Go to next state
-            if end_state:
-                break
+            if state_transition[4] == True:
+                state = self.environment.random_state()
             else:
-                state = next_state
+                state = state_transition[3]
 
-    def get_state_transition(self):
+
+    def get_state_transition(self, state, i):
         # Select an action
         actions = self.q_network.feedforward(state)        
         exploration_factor = 1 / sqrt(i + 1)
@@ -62,12 +80,9 @@ class DeepLearner(object):
             action, estimated_reward = max(actions)
 
         # Create state transition tuple
-        next_state, reward, end_state = self.environment.get_state(state, action)
-        return [state, action, reward, next_state]
+        next_state, reward, is_end_state = self.environment.get_state(state, action)
+        return [state, action, reward, next_state, is_end_state]
         
-                
-            
-            
 
 # Example
 rl = DeepLearner()
