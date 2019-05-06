@@ -51,7 +51,7 @@ class Network():
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
        # for j in range(epochs):
-            self.update_mini_batch(state, eta)
+        self.update_mini_batch(state, eta)
 
     """
             if test_data:
@@ -113,16 +113,16 @@ class Network():
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
         return (nabla_b, nabla_w)
-"""
+    """
     def evaluate(self, test_data):
-        """Return the number of test inputs for which the neural
-        network outputs the correct result. Note that the neural
-        network's output is assumed to be the index of whichever
-        neuron in the final layer has the highest activation."""
+        #Return the number of test inputs for which the neural
+        #network outputs the correct result. Note that the neural
+        #network's output is assumed to be the index of whichever
+        #neuron in the final layer has the highest activation.
         test_results = [(np.argmax(self.feedforward(x)), y)
                         for (x, y) in test_data]
         return sum(int(x == y) for (x, y) in test_results)
-"""
+    """
     def cost_derivative(self, output_activations, y):
         """Return the vector of partial derivatives \partial C_x /
         \partial a for the output activations."""
