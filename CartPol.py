@@ -13,7 +13,7 @@ class CartPole():
         def __init__(self):
                 
                 #Generall properties:
-                self.totalMass = 1.7
+                self.totalMass = 1.1
                 self.gravity = 9.8
                 self.x = 400.0
                 self.y = 600.0
@@ -27,7 +27,7 @@ class CartPole():
                 #Stick properties:
                 self.stickWidth = 3
                 self.stickHeight = 70
-                self.stickMass = 0.7
+                self.stickMass = 0.1
                 self.x_stick = self.x -1.5
                 self.y_stick = self.y - 70
                 #Table properties:
@@ -37,8 +37,12 @@ class CartPole():
                 self.acc_time = 0.2
                 self.x_table = self.x -25
                 self.y_table = self.y -5
+                #Trials for limits:
+                self.dxtrial = 0
+                self.dthetatrial = 0
                 
         def draw(self, screen):
+                print(self.theta)     
                 pygame.draw.line(screen, BROWN, (self.x, self.y), (self.x_stick, self.y_stick), 3)
                 pygame.draw.rect(screen, BLACK, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
         def step(self, act):
@@ -74,11 +78,12 @@ class CartPole():
         #Assigning a force on the table:
         def action(self, act): 
                 if act == 1:
-                        self.motor_force= 1000.0
+                        self.motor_force= 300.0
                 elif act == 0:
-                        self.motor_force = -1000.0
+                        self.motor_force = -300.0
                 self.step(act)
-                
+  
+    
 # The main loop that keeps the game running:
 def game():
         cartpol = CartPole()
@@ -95,12 +100,20 @@ def game():
                 
                 #Fail properties left-side of path:
                 if (200 > (cartpol.x_table - 3) or cartpol.y_stick > 600):
+                        print('x accel:')
+                        print(cartpol.dxtrial)
+                        print('theta accel:')
+                        print(cartpol.dthetatrial)
                         game()
                 if pressed[pygame.K_LEFT]:
                         right_or_left = 0
                         
                 #Fail properties right-side of path:
                 if (600 - cartpol.tableWidth < (cartpol.x_table + 3) or cartpol.y_stick > 600):
+                        print('x accel:')
+                        print(cartpol.dxtrial)
+                        print('theta accel:')
+                        print(cartpol.dthetatrial)
                         game()
                 if pressed[pygame.K_RIGHT]:
                         right_or_left = 1
