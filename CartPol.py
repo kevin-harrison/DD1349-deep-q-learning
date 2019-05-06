@@ -13,7 +13,7 @@ class CartPole():
         def __init__(self):
                 
                 #Generall properties:
-                self.totalMass = 1.1
+                self.totalMass = 1.7
                 self.gravity = 9.8
                 self.x = 400.0
                 self.y = 600.0
@@ -27,7 +27,7 @@ class CartPole():
                 #Stick properties:
                 self.stickWidth = 3
                 self.stickHeight = 70
-                self.stickMass = 0.1
+                self.stickMass = 0.7
                 self.x_stick = self.x -1.5
                 self.y_stick = self.y - 70
                 #Table properties:
@@ -74,16 +74,16 @@ class CartPole():
         #Assigning a force on the table:
         def action(self, act): 
                 if act == 1:
-                        self.motor_force= 100.0
+                        self.motor_force= 1000.0
                 elif act == 0:
-                        self.motor_force = -100.0
+                        self.motor_force = -1000.0
                 self.step(act)
                 
 # The main loop that keeps the game running:
 def game():
         cartpol = CartPole()
         num_runs= 0
-        right_or_left = random.randint(0,1)
+        right_or_left = 2
         done = False
         
         while not done:
@@ -113,7 +113,7 @@ def game():
                 cartpol.action(right_or_left)
                 num_runs += 1
                 path = pygame.draw.line(screen, BLACK, (200,600), (600,600), 1)
-                pygame.display.flip()
+                pygame.display.update()
                 clock.tick(60)
 if __name__ == "__main__":
     game()

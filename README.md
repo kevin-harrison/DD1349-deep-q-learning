@@ -1,6 +1,5 @@
 # DD1349-projinda
 
-# Useful Resources
 
 ## Game of cartpol:
 
@@ -14,6 +13,7 @@ The rules are simple, navigate the table on the screen using left and right arro
 
 There is no finishing number of rounds, the game simply resets everytime you fail. Keep on going for as many times as you like!
 
+![picture](cartpol_graphic.PNG)
 
 #### Physics of cartpol:
 
@@ -28,6 +28,8 @@ This is a lot to take in... As an summary of the easiest parts, we have the forc
 Wich are two second degree differential equations solving the angle theta with respect to the center of the tables **x** coordinate, and the end of the stick. This system can be solved by rewritting it to an ODE-system and then Eulers formula:
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=y(n&plus;1)&space;=&space;y(n)&space;&plus;&space;h&space;\cdot&space;F(y(n),&space;t)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?y(n&plus;1)&space;=&space;y(n)&space;&plus;&space;h&space;\cdot&space;F(y(n),&space;t)" title="y(n+1) = y(n) + h \cdot F(y(n), t)" /></a>
+
+# Useful Resources
 
 ## Neural Network
 [Self-made network for handwritten digits](http://neuralnetworksanddeeplearning.com/chap1.html)
