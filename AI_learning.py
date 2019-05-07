@@ -1,7 +1,7 @@
 
 import math
 import random
-import numpy
+import numpy as np
 
 
 class CartPole():
@@ -83,7 +83,7 @@ class CartPole():
                 dx=(random.randrange(-360,360))
                 dtheta =(random.randrange(-3.17, 3.17))
                 
-                set_state(x,dx,theta,dtheta)
+                self.set_state(x,dx,theta,dtheta)
 
         def get_next_state(self, state, act):
                 set_state(state)
@@ -94,7 +94,7 @@ class CartPole():
                 if (600 - cartpol.tableWidth < (cartpol.x_table + 3) or cartpol.y_stick > 580):
                         reward = 0 # reward zero means that we have breaken the boundaries.
                 # State is provided by the x position(1), x-velocity(2), theta(3) and theta-velocity(4).
-                state = [self.x, self.dx, self.theta, self.dtheta]
+                state = np.array([self.x, self.dx, self.theta, self.dtheta])
                 return reward, state
 
         def set_state(self, state):
