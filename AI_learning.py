@@ -1,6 +1,7 @@
 
 import math
 import random
+import numpy
 
 
 class CartPole():
@@ -75,15 +76,17 @@ class CartPole():
 
 
 
-        #Methods used for the creation of the q-learning algorithm.  
+        #Methods used for the creation of the q-learning algorithm.
         def random_state(self):
+                x =(random.randrange(0,401) + 200)
+                theta =(random.randrange(-math.pi/4, math.pi/4))
+                dx=(random.randrange(-360,360))
+                dtheta =(random.randrange(-3.17, 3.17))
                 
-                self.x=(random.randrange(0,401) + 200)
-                self.theta=(random.randrange(-pi/4, -pi/4))
-                self.dx=(random.randrange(-360,360))
-                self.dtheta=(random.randrange(-3.17, 3.17))
+                set_state(x,dx,theta,dtheta)
 
-        def get_newState_and_reward(self, act):
+        def get_next_state(self, state, act):
+                set_state(state)
                 action(act)
                 reward = 1
                 if (200 > (cartpol.x_table - 3) or cartpol.y_stick > 580):
@@ -93,3 +96,11 @@ class CartPole():
                 # State is provided by the x position(1), x-velocity(2), theta(3) and theta-velocity(4).
                 state = [self.x, self.dx, self.theta, self.dtheta]
                 return reward, state
+
+        def set_state(self, state):
+                
+                self.x= state[1]
+                self.dx= state[2]
+                self.theta=state[3]
+                self.dtheta=state[4]
+                
