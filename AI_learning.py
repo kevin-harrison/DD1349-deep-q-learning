@@ -78,15 +78,17 @@ class CartPole():
 
         #Methods used for the creation of the q-learning algorithm.
         def random_state(self):
-                x =(random.randrange(0,401) + 200)
-                theta =(random.randrange(-math.pi/4, math.pi/4))
-                dx=(random.randrange(-360,360))
-                dtheta =(random.randrange(-3.17, 3.17))
+                x = (random.uniform(0,401) + 200)
+                theta = (random.uniform(-math.pi/4, math.pi/4))
+                dx = (random.uniform(-360,360))
+                dtheta = (random.uniform(-3.17, 3.17))
+                random_state = [x,dx,theta,dtheta]
                 
-                set_state(x,dx,theta,dtheta)
+                self.set_state(random_state)
+                return(numpy.array(random_state))
 
         def get_next_state(self, state, act):
-                set_state(state)
+                self.set_state(state)
                 action(act)
                 reward = 1
                 if (200 > (cartpol.x_table - 3) or cartpol.y_stick > 580):
@@ -94,13 +96,12 @@ class CartPole():
                 if (600 - cartpol.tableWidth < (cartpol.x_table + 3) or cartpol.y_stick > 580):
                         reward = 0 # reward zero means that we have breaken the boundaries.
                 # State is provided by the x position(1), x-velocity(2), theta(3) and theta-velocity(4).
-                state = [self.x, self.dx, self.theta, self.dtheta]
+                state = numpy.array([self.x, self.dx, self.theta, self.dtheta])
                 return reward, state
 
         def set_state(self, state):
-                
-                self.x= state[1]
-                self.dx= state[2]
-                self.theta=state[3]
-                self.dtheta=state[4]
+                self.x = state[0]
+                self.dx = state[1]
+                self.theta = state[2]
+                self.dtheta = state[3]
                 

@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import math
 
 from NeuralNetwork import Network
 from AI_learning import CartPole
@@ -16,7 +17,7 @@ class DeepLearner(object):
         self.num_state_variables = 4
         self.q_network = Network([self.num_state_variables, 5, self.num_actions])
         self.environment = CartPole()
-        self.replay_memory = [] # TODO: find a better data structure that can pop first element in O(1) and access in O(1)
+        self.memory_replay = [] # TODO: find a better data structure that can pop first element in O(1) and access in O(1)
         
 
     def print(self):
@@ -34,12 +35,13 @@ class DeepLearner(object):
         """
         # Get starting state
         state = self.environment.random_state()
+        print("State:",state)
         
         for i in range(100): # 100? # TODO: train more if we break before 100?
 
             # Populate memory replay
             while(len(self.memory_replay) < 2000):
-                state_transistion = get_state_transition(state, i)
+                state_transistion = self.get_state_transition(state, i)
                 self.memory_replay.append(state_transition)
                 if state_transition[4] == True:
                     state = self.environment.random_state()
@@ -47,7 +49,7 @@ class DeepLearner(object):
                     state = state_transition[3]
                     
             # Add transition to memory
-            state_transistion = get_state_transition(state, i)
+            state_transistion = self.get_state_transition(state, i)
             self.memory_replay.append(state_transistion)
             self.memory_replay.pop(0) # INEFFICIENT
             
@@ -77,8 +79,8 @@ class DeepLearner(object):
 
     def get_state_transition(self, state, i):
         # Select an action
-        actions = self.q_network.feedforward(state)        
-        exploration_factor = 1 / sqrt(i + 1)
+        actions = self.q_network.feedforward(state) # Doesn't seem to return correct dimensions, maybe transpose state?
+        exploration_factor = 1 / math.sqrt(i + 1)
         if random.uniform(0,1) > exploration_factor: 
             action = random.randint(0, len(actions)-1)
         else:
