@@ -44,6 +44,8 @@ class DeepLearner(object):
                 self.memory_replay.append(state_transition)
                 if state_transition[4] == True:
                     state = self.environment.random_state()
+                    print("Reached an end state")
+                    print(state_transition[3])
                 else:
                     state = state_transition[3]
                     
@@ -78,9 +80,7 @@ class DeepLearner(object):
 
     def get_state_transition(self, state, i):
         # Select an action
-        print(state)
         actions = self.q_network.feedforward(state) # Doesn't seem to return correct dimensions, maybe transpose state?
-        print("actions:", actions)
         exploration_factor = 1 / math.sqrt(i + 1)
         if random.uniform(0,1) > exploration_factor: 
             action = random.randint(0, len(actions)-1)
