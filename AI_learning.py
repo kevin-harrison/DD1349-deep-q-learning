@@ -85,7 +85,7 @@ class CartPole():
                 random_state = [x,dx,theta,dtheta]
 
                 self.set_state(random_state)
-                return(np.array(random_state))
+                return np.ndarray((4,1), buffer=np.array(random_state))
 
 
         def get_next_state(self, state, act):
@@ -98,8 +98,9 @@ class CartPole():
                         reward = 0 # reward zero means that we have breaken the boundaries.
                 # State is provided by the x position(1), x-velocity(2), theta(3) and theta-velocity(4).
 
+
                 state = np.array([self.x, self.dx, self.theta, self.dtheta])
-                return reward, state
+                return reward, np.ndarray((4,1), buffer=state)
 
         def set_state(self, state):
                 self.x = state[0]

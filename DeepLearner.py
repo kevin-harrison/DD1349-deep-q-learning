@@ -35,7 +35,6 @@ class DeepLearner(object):
         """
         # Get starting state
         state = self.environment.random_state()
-        print("State:",state)
         
         for i in range(100): # 100? # TODO: train more if we break before 100?
 
@@ -79,15 +78,17 @@ class DeepLearner(object):
 
     def get_state_transition(self, state, i):
         # Select an action
+        print(state)
         actions = self.q_network.feedforward(state) # Doesn't seem to return correct dimensions, maybe transpose state?
+        print("actions:", actions)
         exploration_factor = 1 / math.sqrt(i + 1)
         if random.uniform(0,1) > exploration_factor: 
             action = random.randint(0, len(actions)-1)
         else:
-            action, estimated_reward = max(actions)
+            action = np.amax(actions)
 
         # Create state transition tuple
-        next_state, reward, is_end_state = self.environment.get_state(state, action)
+        next_state, reward, is_end_state = self.environment.get_next_state(state, action)
         return [state, action, reward, next_state, is_end_state]
         
 
