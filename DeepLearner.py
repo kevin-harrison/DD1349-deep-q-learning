@@ -40,7 +40,7 @@ class DeepLearner(object):
 
             # Populate memory replay
             while(len(self.memory_replay) < 2000):
-                state_transistion = self.get_state_transition(state, i)
+                state_transition = self.get_state_transition(state, i)
                 self.memory_replay.append(state_transition)
                 if state_transition[4] == True:
                     state = self.environment.random_state()
