@@ -41,7 +41,7 @@ class Network():
             a = sigmoid(np.dot(w, a)+b)
         return a
 
-    def SGD(self, state, eta, test_data=None):
+    def train(self, state, eta, target):
         """Train the neural network using mini-batch stochastic
         gradient descent.  The ``training_data`` is a list of tuples
         ``(x, y)`` representing the training inputs and the desired
@@ -51,6 +51,11 @@ class Network():
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
        # for j in range(epochs):
+<<<<<<< HEAD
+        self.update_mini_batch(state, eta, target)
+            
+    def update_mini_batch(self, state, eta, target):
+=======
         self.update_mini_batch(state, eta)
 
     """
@@ -62,13 +67,13 @@ class Network():
     """
 
     def update_mini_batch(self, state, eta):
+>>>>>>> 4baca42f8f30e920e795b634c647805967bf987d
         """Update the network's weights and biases by applying
         gradient descent using backpropagation to a single mini batch.
         The ``mini_batch`` is a list of tuples ``(x, y)``, and ``eta``
         is the learning rate."""
         x = state
-        y = [0,1] #Antar att detta är vad som kommer att uppdateras av Q-learning.
-
+        y = target
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         delta_nabla_b, delta_nabla_w = self.backprop(x, y)
@@ -113,6 +118,9 @@ class Network():
             nabla_b[-l] = delta
             nabla_w[-l] = np.dot(delta, activations[-l-1].transpose())
         return (nabla_b, nabla_w)
+<<<<<<< HEAD
+
+=======
     """
     def evaluate(self, test_data):
         #Return the number of test inputs for which the neural
@@ -123,6 +131,7 @@ class Network():
                         for (x, y) in test_data]
         return sum(int(x == y) for (x, y) in test_results)
     """
+>>>>>>> 4baca42f8f30e920e795b634c647805967bf987d
     def cost_derivative(self, output_activations, y):
         """Return the vector of partial derivatives \partial C_x /
         \partial a for the output activations."""
