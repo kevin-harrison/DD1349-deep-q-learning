@@ -51,16 +51,21 @@ class DeepLearner(object):
             self.memory_replay.append(state_transistion)
             self.memory_replay.pop(0) # INEFFICIENT
             
-            # Train minibatch
+            # Get minibatch targets
             minibatch = random.sample(self.memory_replay, 64)
+            targets = []
             for state, action, reward, next_state, is_end_state in minibatch:
                 target = reward
-                prediction = self.q_network.feedforward(next_state) # TODO: use frozen network for prediction
+                prediction = self.q_network.feedforward(next_state)
                 if not is_end_state:
-                    target = reward + self.discount_factor * max(prediction)
+                    target = reward + (self.discount_factor * np.amax(prediction))
 
                 target_vector = prediction
                 target_vector[action] = target
+                targets.append(target_vector)
+
+            # Train from targets
+            for target_vector in targets:
                 self.q_network.train(state, target_vector)
                     
             # Go to next state
@@ -90,7 +95,5 @@ rl.print()
 for i in range(1):
     print("EPISODE", i+1)
     rl.episode()
-    print("Current policy:")
-    print(rl.q_matrix)
                             
                             
