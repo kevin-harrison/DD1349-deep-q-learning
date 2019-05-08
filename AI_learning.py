@@ -88,7 +88,7 @@ class CartPole():
                 #normalizing
                 random_state[0] = random_state[0]/600.0
                 random_state[2] = random_state[2]/360.0
-                random_state[4] = random_state[4]/3.17
+                random_state[3] = random_state[3]/3.17
                 return np.ndarray((4,1), buffer=np.array(random_state))
 
 
