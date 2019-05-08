@@ -99,6 +99,9 @@ class CartPole():
 
 
         def get_next_state(self, state, act):
+                random_state[0] = random_state[0]*600.0
+                random_state[2] = random_state[2]*360.0
+                random_state[3] = random_state[3]*3.17
                 self.set_state(state)
                 self.action(act)
                 reward = 1
