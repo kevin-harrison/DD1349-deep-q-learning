@@ -106,11 +106,11 @@ class CartPole():
                 end_state = False
 
                 if (200 > (self.x_table - 3) or (self.theta > math.pi/4 or  self.theta < -math.pi/4)):
-                        reward = 0 # reward zero means that we have breaken the boundaries.
+                        reward = -100 # reward zero means that we have breaken the boundaries.
                         end_state = True
                 if (600 - self.tableWidth < (self.x_table + 3) or (self.theta > math.pi/4 or self.theta < -math.pi/4)):
                         end_state = True
-                        reward = 0 # reward zero means that we have breaken the boundaries.
+                        reward = -100 # reward zero means that we have breaken the boundaries.
                 # State is provided by the x position(1), x-velocity(2), theta(3) and theta-velocity(4).
 
 
