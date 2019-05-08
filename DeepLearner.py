@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import math
-
+from collections import deque
 
 from NeuralNetwork import Network
 from AI_learning import CartPole
@@ -12,13 +12,13 @@ class DeepLearner(object):
         """
         learning_rate and discount_factor are hyperparameters whose values are not set in stone
         """
-        self.learning_rate = 0.2
+        self.learning_rate = 0.02
         self.discount_factor = 0.8
         self.num_actions = 2
         self.num_state_variables = 4
         self.q_network = Network([self.num_state_variables, 25, 25, self.num_actions])
         self.environment = CartPole()
-        self.memory_replay = [] # TODO: find a better data structure that can pop first element in O(1) and access in O(1)
+        self.memory_replay = deque(maxlen=200) # TODO: find a better data structure that can pop first element in O(1) and access in O(1)
 
 
     def print(self):
@@ -38,10 +38,10 @@ class DeepLearner(object):
         the policy should be a "good" solution to the prob5lem
         """
         # Get starting state
-        state = self.environment.random_state()
-        #state = self.environment.get_start_state()
+        #state = self.environment.random_state()
+        state = self.environment.get_start_state()
 
-        for i in range(10000):
+        for i in range(1000):
 
             # Populate memory replay
             while(len(self.memory_replay) < 200):
@@ -49,38 +49,36 @@ class DeepLearner(object):
                 self.memory_replay.append(state_transition)
                 if state_transition[4] == True:
                     state = self.environment.random_state()
-                    #state = self.environment.get_start_state()
                 else:
                     state = state_transition[3]
 
             # Add transition to memory
             state_transition = self.get_state_transition(state, i)
             self.memory_replay.append(state_transition)
-            self.memory_replay.pop(0) # INEFFICIENT
 
-            # Get minibatch targets
-            minibatch = random.sample(self.memory_replay, 32)
-            targets = []
-            for state, action, reward, next_state, is_end_state in minibatch:
-                target = reward
-                prediction = self.q_network.feedforward(next_state)
-                if not is_end_state:
-                    target = reward + (self.discount_factor * np.amax(prediction))
-
-                target_vector = prediction
-                target_vector[(action)] = target
-                targets.append(target_vector)
-
-            # Train from targets
-            for target_vector in targets:
-                self.q_network.train(state, target_vector)
+            # Train on memories
+            self.replay()
 
             # Go to next state
             if state_transition[4] == True:
                 state = self.environment.random_state()
-                #state = self.environment.get_start_state()
             else:
                 state = state_transition[3]
+
+
+    def replay(self):
+        # Get minibatch targets
+        minibatch = random.sample(self.memory_replay, 32)
+
+        for state, action, reward, next_state, is_end_state in minibatch:
+            target = reward
+            if not is_end_state:
+                prediction = self.q_network.feedforward(next_state)
+                target = reward + (self.discount_factor * np.amax(prediction))
+
+            target_vector = self.q_network.feedforward(state)
+            target_vector[(action)] = target
+            self.q_network.train(state, target_vector)
 
 
     def get_state_transition(self, state, i):
