@@ -2,6 +2,13 @@
 import math
 import random
 import numpy as np
+import pygame
+screen = pygame.display.set_mode((800, 800))
+pygame.init()
+clock = pygame.time.Clock()
+WHITE = (255,255,255)
+BROWN = (151, 84, 69)
+BLACK = (0,0,0)
 
 
 class CartPole():
@@ -59,6 +66,8 @@ class CartPole():
                 self.y_stick = self.y + self.stickHeight*math.cos(angle)
                 self.x_stick = self.x + self.stickHeight*math.sin(angle)
                 self.x_table = self.x -25
+                if (self.startGraphic):
+                        self.draw()
 
 
         #Eulers fomula with one step:
@@ -88,7 +97,7 @@ class CartPole():
                 #normalizing
                 random_state[0] = random_state[0]/600.0
                 random_state[2] = random_state[2]/360.0
-                random_state[4] = random_state[4]/3.17
+                random_state[3] = random_state[3]/3.17
                 return np.ndarray((4,1), buffer=np.array(random_state))
 
 
@@ -116,4 +125,48 @@ class CartPole():
                 self.dx = state[1]
                 self.theta = state[2]
                 self.dtheta = state[3]
+        def get_start_state(self):
+                self.x = 0
+                self.dx = 0
+                self.theta = 0
+                self.dtheta = 0
+                
+                return np.ndarray((4,1), buffer=np.array([0,0,0,0]))
+'''     
+        def game(self):
+                num_runs= 0
+                right_or_left = None
+                done = False
+                self.set_state = [0,0,0,0]
+                
+                while not done:
+                        state = np.array([self.x/600.0, self.dx/360.0, self.theta, self.dtheta/3.17])
+                        right_or_left = get_action(np.ndarray((4,1), buffer=np.array(state)))
 
+                        
+                        # Game exit:
+                        for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                        pygame.quit()
+                        
+                        #Fail properties left-side of path:
+                        if (200 > (self.x_table - 3) or (self.theta > math.pi/4 or  self.theta < -math.pi/4)):
+                                pygame.quit()
+
+                                
+                        #Fail properties right-side of path:
+                        if (600 - self.tableWidth < (self.x_table + 3) or (self.theta > math.pi/4 or self.theta < -math.pi/4)):
+                                pygame.quit()
+
+                                
+                        # Reseting screen:
+                        screen.fill(WHITE)
+                        myfont = pygame.font.SysFont("space", 40)
+                        label = myfont.render("number runs: " + str(num_runs), 1, (BLACK))
+                        screen.blit(label, (320, 700))
+                        self.action(right_or_left)
+                        num_runs += 1
+                        path = pygame.draw.line(screen, BLACK, (200,600), (600,600), 1)
+                        pygame.display.update()
+                        clock.tick(60)
+'''
