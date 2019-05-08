@@ -6,7 +6,7 @@ import numpy as np
 
 class CartPole():
         def __init__(self):
-                
+
                 #Generall properties:
                 self.totalMass = 1.7
                 self.gravity = 9.8
@@ -32,11 +32,11 @@ class CartPole():
                 self.acc_time = 0.2
                 self.x_table = self.x -25
                 self.y_table = self.y -5
-                
+
         def draw_position(self, screen):
                 pygame.draw.line(screen, BROWN, (self.x, self.y), (self.x_stick, self.y_stick), 3)
                 pygame.draw.rect(screen, BLACK, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
-                
+
         def step(self, act):
                 costheta = math.cos(self.theta)
                 sintheta = math.sin(self.theta)
@@ -47,12 +47,12 @@ class CartPole():
 
                 #Getting the state of the object using eulers method:
                 self.theta = self.euler(self.theta, self.dtheta)
-                self.dtheta = self.euler(self.dtheta, self.d2theta)                
+                self.dtheta = self.euler(self.dtheta, self.d2theta)
                 self.x = self.euler(self.x, self.dx)
                 self.dx = self.euler(self.dx, self.d2x)
 
                 # Getting the angle in the right intervall and startvalue:
-                angle = -self.theta + math.pi 
+                angle = -self.theta + math.pi
                 if angle > 0:
                         angle = angle - 2*math.pi * math.ceil(angle/(2*math.pi))
                         angle = math.fmod(angle-math.pi, 2*math.pi) + math.pi
@@ -60,14 +60,14 @@ class CartPole():
                 self.x_stick = self.x + self.stickHeight*math.sin(angle)
                 self.x_table = self.x -25
 
-                
+
         #Eulers fomula with one step:
         def euler(self, value, dvalue):
                 value = value + self.eulerStep*dvalue
                 return value
-        
+
         #Assigning a force on the table:
-        def action(self, act): 
+        def action(self, act):
                 if act == 1:
                         self.motor_force= 300.0
                 elif act == 0:
@@ -78,29 +78,42 @@ class CartPole():
 
         #Methods used for the creation of the q-learning algorithm.
         def random_state(self):
-                x =(random.randrange(0,401) + 200)
-                theta =(random.randrange(-math.pi/4, math.pi/4))
-                dx=(random.randrange(-360,360))
-                dtheta =(random.randrange(-3.17, 3.17))
-                
-                self.set_state(x,dx,theta,dtheta)
+                x = (random.uniform(0,401) + 200)
+                theta = (random.uniform(-math.pi/4, math.pi/4))
+                dx = (random.uniform(-360,360))
+                dtheta = (random.uniform(-3.17, 3.17))
+                random_state = [x,dx,theta,dtheta]
+
+                self.set_state(random_state)
+                return np.ndarray((4,1), buffer=np.array(random_state))
+
 
         def get_next_state(self, state, act):
-                set_state(state)
-                action(act)
+                self.set_state(state)
+                self.action(act)
                 reward = 1
+<<<<<<< HEAD
                 if (200 > (cartpol.x_table - 3) or (cartpol.theta > math.pi/4 or  cartpol.theta < -math.pi/4)):
                         reward = 0 # reward zero means that we have breaken the boundaries.
                 if (600 - cartpol.tableWidth < (cartpol.x_table + 3) or (cartpol.theta > math.pi/4 or  cartpol.theta < -math.pi/4)):
+=======
+                end_state = False
+                if (200 > (self.x_table - 3) or self.y_stick > 580):
+                        reward = 0 # reward zero means that we have breaken the boundaries.
+                        end_state = True
+                if (600 - self.tableWidth < (self.x_table + 3) or self.y_stick > 580):
+                        end_state = True
+>>>>>>> 39caeb341edf331201a9dcb180483e0d81fe9f21
                         reward = 0 # reward zero means that we have breaken the boundaries.
                 # State is provided by the x position(1), x-velocity(2), theta(3) and theta-velocity(4).
+
+
                 state = np.array([self.x, self.dx, self.theta, self.dtheta])
-                return reward, state
+                return np.ndarray((4,1), buffer=state), reward, end_state
 
         def set_state(self, state):
-                
-                self.x= state[1]
-                self.dx= state[2]
-                self.theta=state[3]
-                self.dtheta=state[4]
-                
+                self.x = state[0]
+                self.dx = state[1]
+                self.theta = state[2]
+                self.dtheta = state[3]
+
