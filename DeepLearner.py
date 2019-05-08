@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import math
-import matplotlib.pyplot as plt
+
 
 from NeuralNetwork import Network
 from AI_learning import CartPole
@@ -16,7 +16,7 @@ class DeepLearner(object):
         self.discount_factor = 0.8
         self.num_actions = 2
         self.num_state_variables = 4
-        self.q_network = Network([self.num_state_variables, 5, self.num_actions])
+        self.q_network = Network([self.num_state_variables, 25, 25, self.num_actions])
         self.environment = CartPole()
         self.memory_replay = [] # TODO: find a better data structure that can pop first element in O(1) and access in O(1)
 
@@ -39,15 +39,17 @@ class DeepLearner(object):
         """
         # Get starting state
         state = self.environment.random_state()
+        #state = self.environment.get_start_state()
 
-        for i in range(50000): # 100?
+        for i in range(10000):
 
             # Populate memory replay
-            while(len(self.memory_replay) < 2000):
+            while(len(self.memory_replay) < 200):
                 state_transition = self.get_state_transition(state, i)
                 self.memory_replay.append(state_transition)
                 if state_transition[4] == True:
                     state = self.environment.random_state()
+                    #state = self.environment.get_start_state()
                 else:
                     state = state_transition[3]
 
@@ -57,7 +59,7 @@ class DeepLearner(object):
             self.memory_replay.pop(0) # INEFFICIENT
 
             # Get minibatch targets
-            minibatch = random.sample(self.memory_replay, 5)
+            minibatch = random.sample(self.memory_replay, 32)
             targets = []
             for state, action, reward, next_state, is_end_state in minibatch:
                 target = reward
@@ -76,6 +78,7 @@ class DeepLearner(object):
             # Go to next state
             if state_transition[4] == True:
                 state = self.environment.random_state()
+                #state = self.environment.get_start_state()
             else:
                 state = state_transition[3]
 
@@ -83,7 +86,6 @@ class DeepLearner(object):
     def get_state_transition(self, state, i):
         # Select an action
         actions = self.q_network.feedforward(state)
-
         exploration_factor = 1 / math.sqrt(i + 1)
         if random.uniform(0,1) > exploration_factor:
             action = random.randint(0, len(actions)-1)
@@ -104,9 +106,13 @@ class DeepLearner(object):
             state, reward, is_end_state = self.environment.get_next_state(state, action)
             total_reward += reward
 
+        print(total_reward)
         return total_reward
 
+
+
 # Example
+'''
 rl = DeepLearner()
 rl.print()
 
@@ -115,3 +121,4 @@ for i in range(5):
     rl.episode()
     rl.print()
     rl.play_game()
+'''
