@@ -98,7 +98,7 @@ class DeepLearner(object):
         total_reward = 0
         
         while not is_end_state:
-            action = self.q_network.feedfoward(state)
+            action = np.argmax(self.q_network.feedforward(state))
             state, reward, is_end_state = self.environment.get_next_state(state, action)
             total_reward += reward
 
@@ -111,6 +111,7 @@ rl.print()
 for i in range(5):
     print("EPISODE", i+1)
     rl.episode()
-    rl.print()
+    #rl.print()
+    rl.play_game()
                             
                             

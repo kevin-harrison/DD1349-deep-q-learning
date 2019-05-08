@@ -3,9 +3,7 @@ import math
 import random
 import numpy as np
 import pygame
-screen = pygame.display.set_mode((800, 800))
-pygame.init()
-clock = pygame.time.Clock()
+
 WHITE = (255,255,255)
 BROWN = (151, 84, 69)
 BLACK = (0,0,0)
@@ -66,8 +64,7 @@ class CartPole():
                 self.y_stick = self.y + self.stickHeight*math.cos(angle)
                 self.x_stick = self.x + self.stickHeight*math.sin(angle)
                 self.x_table = self.x -25
-                if (self.startGraphic):
-                        self.draw()
+   
 
 
         #Eulers fomula with one step:
@@ -125,6 +122,7 @@ class CartPole():
                 self.dx = state[1]
                 self.theta = state[2]
                 self.dtheta = state[3]
+                
         def get_start_state(self):
                 self.x = 0
                 self.dx = 0
