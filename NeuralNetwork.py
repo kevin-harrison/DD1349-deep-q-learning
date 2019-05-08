@@ -31,6 +31,7 @@ class Network():
         ever used in computing the outputs from later layers."""
         self.num_layers = len(sizes)
         self.sizes = sizes
+        self.learning_rate = 0.2
         self.biases = [np.random.randn(y, 1) for y in sizes[1:]]
         self.weights = [np.random.randn(y, x)
                         for x, y in zip(sizes[:-1], sizes[1:])]
@@ -42,7 +43,7 @@ class Network():
             a = sigmoid(np.dot(w, a)+b)
         return a
 
-    def train(self, state, eta, target):
+    def train(self, state, target):
         """Train the neural network using mini-batch stochastic
         gradient descent.  The ``training_data`` is a list of tuples
         ``(x, y)`` representing the training inputs and the desired
@@ -52,9 +53,9 @@ class Network():
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
        # for j in range(epochs):
-        self.update_mini_batch(state, eta, target)
+        self.update_mini_batch(state, target)
 
-    def update_mini_batch(self, state, eta):
+    def update_mini_batch(self, state, target):
         """Update the network's weights and biases by applying
         gradient descent using backpropagation to a single mini batch.
         The ``mini_batch`` is a list of tuples ``(x, y)``, and ``eta``
@@ -66,9 +67,9 @@ class Network():
         delta_nabla_b, delta_nabla_w = self.backprop(x, y)
         nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
         nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-        self.weights = [w-(eta/len(mini_batch))*nw
+        self.weights = [w-(self.learning_rate/1)*nw                 # changed len(mini_batch) to 1
                         for w, nw in zip(self.weights, nabla_w)]
-        self.biases = [b-(eta/len(mini_batch))*nb
+        self.biases = [b-(self.learning_rate/1)*nb                  # changed len(mini_batch) to 1
                        for b, nb in zip(self.biases, nabla_b)]
 
     def backprop(self, x, y):
@@ -98,7 +99,7 @@ class Network():
         # second-last layer, and so on.  It's a renumbering of the
         # scheme in the book, used here to take advantage of the fact
         # that Python can use negative indices in lists.
-        for l in xrange(2, self.num_layers):
+        for l in range(2, self.num_layers):
             z = zs[-l]
             sp = sigmoid_prime(z)
             delta = np.dot(self.weights[-l+1].transpose(), delta) * sp
