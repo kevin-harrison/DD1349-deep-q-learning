@@ -39,7 +39,7 @@ class DeepLearner(object):
         # Get starting state
         state = self.environment.random_state()
         
-        for i in range(100): # 100? # TODO: train more if we break before 100?
+        for i in range(1000): # 100?
 
             # Populate memory replay
             while(len(self.memory_replay) < 2000):
@@ -51,8 +51,8 @@ class DeepLearner(object):
                     state = state_transition[3]
                     
             # Add transition to memory
-            state_transistion = self.get_state_transition(state, i)
-            self.memory_replay.append(state_transistion)
+            state_transition = self.get_state_transition(state, i)
+            self.memory_replay.append(state_transition)
             self.memory_replay.pop(0) # INEFFICIENT
             
             # Get minibatch targets
@@ -79,7 +79,6 @@ class DeepLearner(object):
                 state = state_transition[3]
 
 
-
     def get_state_transition(self, state, i):
         # Select an action
         actions = self.q_network.feedforward(state) # Doesn't seem to return correct dimensions, maybe transpose state?
@@ -92,15 +91,26 @@ class DeepLearner(object):
         # Create state transition tuple
         next_state, reward, is_end_state = self.environment.get_next_state(state, action)
         return [state, action, reward, next_state, is_end_state]
+
+    def play_game(self):
+        state = self.environment.get_start_state()
+        is_end_state = False
+        total_reward = 0
         
+        while not is_end_state:
+            action = self.q_network.feedfoward(state)
+            state, reward, is_end_state = self.environment.get_next_state(state, action)
+            total_reward += reward
+
+        print("Total reward:")
+        print(total_reward)
 
 # Example
-
 rl = DeepLearner()
 rl.print()
-for i in range(1):
+for i in range(5):
     print("EPISODE", i+1)
     rl.episode()
-rl.print()
+    rl.print()
                             
                             
