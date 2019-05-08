@@ -22,8 +22,7 @@ class DeepLearner(object):
 
     def print(self):
         """Prints out classes fields"""
-        print("Learning Rate: " + str(self.learning_rate))
-        print("Discount Factor: " + str(self.discount_factor))
+        print("Memories:", len(self.memory_replay))
         print("Q-Network:")
         print(self.q_network)
         print("Biases:")
