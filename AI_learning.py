@@ -117,10 +117,10 @@ class CartPole():
 
 
                 # Normilising the vector values.
-                state = np.array([self.x/600.0, self.dx/360.0, self.theta, self.dtheta])
+                next_state = np.array([self.x/600.0, self.dx/360.0, self.theta, self.dtheta])
                 state[0] = state[0]/600.0
                 state[1] = state[1]/360.0
-                return np.ndarray((4,1), buffer=state), reward, end_state
+                return np.ndarray((4,1), buffer=next_state), reward, end_state
 
         def set_state(self, state):
                 self.x = state[0]
