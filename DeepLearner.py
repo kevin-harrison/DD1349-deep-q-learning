@@ -38,7 +38,6 @@ class DeepLearner(object):
         """
         # Get starting state
         state = self.environment.random_state()
-        print("random_state:", state)
         
         for i in range(1000): # 100?
 
@@ -92,15 +91,6 @@ class DeepLearner(object):
 
         # Create state transition tuple
         next_state, reward, is_end_state = self.environment.get_next_state(state, action)
-        
-        print("state:", state)
-  
-        print("next state:", next_state)
-
-        print("is end:", is_end_state)
-   
-        print()
-        
         return [state, action, reward, next_state, is_end_state]
 
     def play_game(self):
