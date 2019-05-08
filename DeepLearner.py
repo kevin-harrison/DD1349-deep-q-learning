@@ -39,7 +39,7 @@ class DeepLearner(object):
         # Get starting state
         state = self.environment.random_state()
         
-        for i in range(1000): # 100?
+        for i in range(50000): # 100?
 
             # Populate memory replay
             while(len(self.memory_replay) < 2000):
@@ -56,7 +56,7 @@ class DeepLearner(object):
             self.memory_replay.pop(0) # INEFFICIENT
             
             # Get minibatch targets
-            minibatch = random.sample(self.memory_replay, 64)
+            minibatch = random.sample(self.memory_replay, 5)
             targets = []
             for state, action, reward, next_state, is_end_state in minibatch:
                 target = reward
@@ -103,16 +103,27 @@ class DeepLearner(object):
             state, reward, is_end_state = self.environment.get_next_state(state, action)
             total_reward += reward
 
+            '''
+            print("state:", state)
+            print("action:", action)
+            print("reward:", reward)
+            print("end:", is_end_state)
+            print()
+            '''
+            
         print("Total reward:")
         print(total_reward)
 
 # Example
 rl = DeepLearner()
+
+
+
 rl.print()
 for i in range(5):
     print("EPISODE", i+1)
     rl.episode()
-    #rl.print()
+    rl.print()
     rl.play_game()
 
                       
