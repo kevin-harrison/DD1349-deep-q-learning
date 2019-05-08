@@ -26,6 +26,10 @@ class DeepLearner(object):
         print("Discount Factor: " + str(self.discount_factor))
         print("Q-Network:")
         print(self.q_network)
+        print("Biases:")
+        print(self.q_network.biases)
+        print("Weights:")
+        print(self.q_network.weights)
 
     def episode(self):
         """Execute an episode of the Q learning algorithm
@@ -46,7 +50,6 @@ class DeepLearner(object):
                     state = self.environment.random_state()
                 else:
                     state = state_transition[3]
-            print("memories gathered")
                     
             # Add transition to memory
             state_transistion = self.get_state_transition(state, i)
@@ -77,6 +80,7 @@ class DeepLearner(object):
                 state = state_transition[3]
 
 
+
     def get_state_transition(self, state, i):
         # Select an action
         actions = self.q_network.feedforward(state) # Doesn't seem to return correct dimensions, maybe transpose state?
@@ -98,5 +102,6 @@ rl.print()
 for i in range(1):
     print("EPISODE", i+1)
     rl.episode()
+rl.print()
                             
                             
