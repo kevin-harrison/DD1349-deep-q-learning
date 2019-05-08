@@ -92,7 +92,18 @@ class DeepLearner(object):
         next_state, reward, is_end_state = self.environment.get_next_state(state, action)
         return [state, action, reward, next_state, is_end_state]
 
+    def play_game(self):
+        state = self.environment.get_start_state()
+        is_end_state = False
+        total_reward = 0
+        
+        while not is_end_state:
+            action = self.q_network.feedfoward(state)
+            state, reward, is_end_state = self.environment.get_next_state(state, action)
+            total_reward += reward
 
+        print("Total reward:")
+        print(total_reward)
 
 # Example
 rl = DeepLearner()
