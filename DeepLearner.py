@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import math
+import matplotlib.pyplot as plt
 
 from NeuralNetwork import Network
 from AI_learning import CartPole
@@ -18,7 +19,7 @@ class DeepLearner(object):
         self.q_network = Network([self.num_state_variables, 5, self.num_actions])
         self.environment = CartPole()
         self.memory_replay = [] # TODO: find a better data structure that can pop first element in O(1) and access in O(1)
-        
+
 
     def print(self):
         """Prints out classes fields"""
@@ -38,7 +39,7 @@ class DeepLearner(object):
         """
         # Get starting state
         state = self.environment.random_state()
-        
+
         for i in range(50000): # 100?
 
             # Populate memory replay
@@ -49,12 +50,12 @@ class DeepLearner(object):
                     state = self.environment.random_state()
                 else:
                     state = state_transition[3]
-                    
+
             # Add transition to memory
             state_transition = self.get_state_transition(state, i)
             self.memory_replay.append(state_transition)
             self.memory_replay.pop(0) # INEFFICIENT
-            
+
             # Get minibatch targets
             minibatch = random.sample(self.memory_replay, 5)
             targets = []
@@ -71,7 +72,7 @@ class DeepLearner(object):
             # Train from targets
             for target_vector in targets:
                 self.q_network.train(state, target_vector)
-                    
+
             # Go to next state
             if state_transition[4] == True:
                 state = self.environment.random_state()
@@ -84,7 +85,7 @@ class DeepLearner(object):
         actions = self.q_network.feedforward(state)
 
         exploration_factor = 1 / math.sqrt(i + 1)
-        if random.uniform(0,1) > exploration_factor: 
+        if random.uniform(0,1) > exploration_factor:
             action = random.randint(0, len(actions)-1)
         else:
             action = np.argmax(actions)
@@ -97,34 +98,20 @@ class DeepLearner(object):
         state = self.environment.get_start_state()
         is_end_state = False
         total_reward = 0
-        
+
         while not is_end_state:
             action = np.argmax(self.q_network.feedforward(state))
             state, reward, is_end_state = self.environment.get_next_state(state, action)
             total_reward += reward
 
-            '''
-            print("state:", state)
-            print("action:", action)
-            print("reward:", reward)
-            print("end:", is_end_state)
-            print()
-            '''
-            
-        print("Total reward:")
-        print(total_reward)
+        return total_reward
 
 # Example
 rl = DeepLearner()
-
-
-
 rl.print()
+
 for i in range(5):
     print("EPISODE", i+1)
     rl.episode()
     rl.print()
     rl.play_game()
-
-                      
-                            
