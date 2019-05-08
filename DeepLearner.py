@@ -38,6 +38,7 @@ class DeepLearner(object):
         """
         # Get starting state
         state = self.environment.random_state()
+        print("random start:", state)
         
         for i in range(1000): # 100?
 
@@ -81,7 +82,7 @@ class DeepLearner(object):
 
     def get_state_transition(self, state, i):
         # Select an action
-        actions = self.q_network.feedforward(state) # Doesn't seem to return correct dimensions, maybe transpose state?
+        actions = self.q_network.feedforward(state)
         exploration_factor = 1 / math.sqrt(i + 1)
         if random.uniform(0,1) > exploration_factor: 
             action = random.randint(0, len(actions)-1)
@@ -90,6 +91,15 @@ class DeepLearner(object):
 
         # Create state transition tuple
         next_state, reward, is_end_state = self.environment.get_next_state(state, action)
+        '''
+        print("state:", state)
+        print()
+        print("next state:", next_state)
+        print()
+        print("is end:", is_end_state)
+        print()
+        print()
+        '''
         return [state, action, reward, next_state, is_end_state]
 
     def play_game(self):
@@ -113,5 +123,6 @@ for i in range(5):
     rl.episode()
     #rl.print()
     rl.play_game()
-                            
+
+                      
                             
