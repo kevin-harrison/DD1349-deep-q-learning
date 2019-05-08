@@ -94,16 +94,17 @@ class CartPole():
                 reward = 1
                 end_state = False
 
-                if (200 > (cartpol.x_table - 3) or (cartpol.theta > math.pi/4 or  cartpol.theta < -math.pi/4)):
+                if (200 > (self.x_table - 3) or (self.theta > math.pi/4 or  self.theta < -math.pi/4)):
                         reward = 0 # reward zero means that we have breaken the boundaries.
                         end_state = True
-                if (600 - cartpol.tableWidth < (cartpol.x_table + 3) or (cartpol.theta > math.pi/4 or  cartpol.theta < -math.pi/4)):
+                if (600 - self.tableWidth < (self.x_table + 3) or (self.theta > math.pi/4 or self.theta < -math.pi/4)):
                         end_state = True
                         reward = 0 # reward zero means that we have breaken the boundaries.
                 # State is provided by the x position(1), x-velocity(2), theta(3) and theta-velocity(4).
 
 
-                state = np.array([self.x, self.dx, self.theta, self.dtheta])
+                # Normilising the vector values.
+                state = np.array([self.x/600.0, self.dx/360.0, self.theta, self.dtheta/3.17])
                 return np.ndarray((4,1), buffer=state), reward, end_state
 
         def set_state(self, state):
