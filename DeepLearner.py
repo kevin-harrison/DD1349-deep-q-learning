@@ -31,7 +31,7 @@ class DeepLearner(object):
         """Execute an episode of the Q learning algorithm
 
         Starts at a random state and ends when the goal state is reached. After calling this function many times
-        the policy should be a "good" solution to the problem
+        the policy should be a "good" solution to the prob5lem
         """
         # Get starting state
         state = self.environment.random_state()
@@ -44,10 +44,9 @@ class DeepLearner(object):
                 self.memory_replay.append(state_transition)
                 if state_transition[4] == True:
                     state = self.environment.random_state()
-                    print("Reached an end state")
-                    print(state_transition[3])
                 else:
                     state = state_transition[3]
+            print("memories gathered")
                     
             # Add transition to memory
             state_transistion = self.get_state_transition(state, i)
@@ -64,7 +63,7 @@ class DeepLearner(object):
                     target = reward + (self.discount_factor * np.amax(prediction))
 
                 target_vector = prediction
-                target_vector[action] = target
+                target_vector[(action)] = target
                 targets.append(target_vector)
 
             # Train from targets
@@ -85,7 +84,7 @@ class DeepLearner(object):
         if random.uniform(0,1) > exploration_factor: 
             action = random.randint(0, len(actions)-1)
         else:
-            action = np.amax(actions)
+            action = np.argmax(actions)
 
         # Create state transition tuple
         next_state, reward, is_end_state = self.environment.get_next_state(state, action)
@@ -93,6 +92,7 @@ class DeepLearner(object):
         
 
 # Example
+
 rl = DeepLearner()
 rl.print()
 for i in range(1):
