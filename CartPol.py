@@ -44,6 +44,7 @@ class CartPole():
         def draw(self, screen):     
                 pygame.draw.line(screen, BROWN, (self.x, self.y), (self.x_stick, self.y_stick), 3)
                 pygame.draw.rect(screen, BLACK, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
+                print(self.theta) 
         def step(self, act):
                 costheta = math.cos(self.theta)
                 sintheta = math.sin(self.theta)
@@ -89,6 +90,7 @@ def game():
         num_runs= 0
         right_or_left = 2
         done = False
+
         
         while not done:
                 # Game exit:
