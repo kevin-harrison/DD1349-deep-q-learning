@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
+
+# temp libraries
 from collections import deque
+import random
 
 from DeepLearner import DeepLearner
 
@@ -20,11 +23,9 @@ class ModelTrainer(object):
 				model = self.models[i]
 				model.episode()
 				self.training_data[i].append(model.play_game())
-		print(self.training_data)
 
 	def plot_data(self):
 		num_models = len(self.models)
-		print(num_models)
 		for i in range(num_models):
 			plt.subplot(num_models, 1, i+1)
 			plt.plot(np.arange(len(self.training_data[0])), self.training_data[i], "o-")
@@ -34,15 +35,9 @@ class ModelTrainer(object):
 		plt.show()
 
 
-d = deque(maxlen=5)
-for i in range(10):
-	d.append(i)
-print(d)
-
-
 trainer = ModelTrainer()
 for i in range(1):
 	trainer.add_model()
 
-trainer.get_training_data(5)
+trainer.get_training_data(20)
 trainer.plot_data()
