@@ -39,5 +39,5 @@ trainer = ModelTrainer()
 for i in range(1):
 	trainer.add_model()
 
-trainer.get_training_data(20)
+trainer.get_training_data(10)
 trainer.plot_data()

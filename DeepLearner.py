@@ -12,14 +12,15 @@ class DeepLearner(object):
         """
         learning_rate and discount_factor are hyperparameters whose values are not set in stone
         """
-        self.learning_rate = 0.02
+        #self.learning_rate = 0.02
         self.discount_factor = 0.8
         self.num_actions = 2
         self.num_state_variables = 4
         self.q_network = Network([self.num_state_variables, 25, 25, self.num_actions])
         self.environment = CartPole()
         self.memory_replay = deque(maxlen=200) # TODO: find a better data structure that can pop first element in O(1) and access in O(1)
-
+        self.iterations = 10000
+        self.exploration_rate = 1
 
     def print(self):
         """Prints out classes fields"""
@@ -80,12 +81,18 @@ class DeepLearner(object):
             target_vector[(action)] = target
             self.q_network.train(state, target_vector)
 
+            # TEMPORARY
+            if self.exploration_rate > 0:
+                self.iterations -= 1
+                self.exploration_rate -= 1 / self.iterations
+
 
     def get_state_transition(self, state, i):
         # Select an action
         actions = self.q_network.feedforward(state)
-        exploration_factor = 1 / math.sqrt(i + 1)
-        if random.uniform(0,1) > exploration_factor:
+        #exploration_factor = 1 / math.sqrt(i + 1)
+        #if random.uniform(0,1) > exploration_factor:
+        if random.random() > self.exploration_rate:
             action = random.randint(0, len(actions)-1)
         else:
             action = np.argmax(actions)
