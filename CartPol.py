@@ -5,7 +5,8 @@ screen = pygame.display.set_mode((800, 800))
 pygame.init()
 clock = pygame.time.Clock()
 WHITE = (255,255,255)
-BROWN
+BROWN = (151, 84, 69)
+BLACK = (0,0,0)
 
 
 class CartPole():
@@ -40,8 +41,7 @@ class CartPole():
                 self.dxtrial = 0
                 self.dthetatrial = 0
                 
-        def draw(self, screen):
-                print(self.theta)     
+        def draw(self, screen):     
                 pygame.draw.line(screen, BROWN, (self.x, self.y), (self.x_stick, self.y_stick), 3)
                 pygame.draw.rect(screen, BLACK, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
         def step(self, act):
@@ -82,7 +82,7 @@ class CartPole():
                         self.motor_force = -300.0
                 self.step(act)
   
-"
+
 # The main loop that keeps the game running:
 def game():
         cartpol = CartPole()
@@ -99,20 +99,12 @@ def game():
                 
                 #Fail properties left-side of path:
                 if (200 > (cartpol.x_table - 3) or cartpol.y_stick > 600):
-                        print('x accel:')
-                        print(cartpol.dxtrial)
-                        print('theta accel:')
-                        print(cartpol.dthetatrial)
                         game()
                 if pressed[pygame.K_LEFT]:
                         right_or_left = 0
                         
                 #Fail properties right-side of path:
-                if (600 - cartpol.tableWidth < (cartpol.x_table + 3) or cartpol.y_stick > 600):
-                        print('x accel:')
-                        print(cartpol.dxtrial)
-                        print('theta accel:')
-                        print(cartpol.dthetatrial)
+                if (600 - cartpol.tableWidth < (cartpol.x_table + 3) or (cartpol.theta > math.pi/4 or  cartpol.theta < -math.pi/4)):
                         game()
                 if pressed[pygame.K_RIGHT]:
                         right_or_left = 1

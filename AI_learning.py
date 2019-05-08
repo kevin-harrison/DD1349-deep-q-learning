@@ -89,9 +89,9 @@ class CartPole():
                 set_state(state)
                 action(act)
                 reward = 1
-                if (200 > (cartpol.x_table - 3) or cartpol.y_stick > 580):
+                if (200 > (cartpol.x_table - 3) or (cartpol.theta > math.pi/4 or  cartpol.theta < -math.pi/4)):
                         reward = 0 # reward zero means that we have breaken the boundaries.
-                if (600 - cartpol.tableWidth < (cartpol.x_table + 3) or cartpol.y_stick > 580):
+                if (600 - cartpol.tableWidth < (cartpol.x_table + 3) or (cartpol.theta > math.pi/4 or  cartpol.theta < -math.pi/4)):
                         reward = 0 # reward zero means that we have breaken the boundaries.
                 # State is provided by the x position(1), x-velocity(2), theta(3) and theta-velocity(4).
                 state = np.array([self.x, self.dx, self.theta, self.dtheta])
