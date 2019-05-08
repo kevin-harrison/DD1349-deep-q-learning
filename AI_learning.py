@@ -78,10 +78,10 @@ class CartPole():
 
         #Methods used for the creation of the q-learning algorithm.
         def random_state(self):
-                x = (random.uniform(0,401) + 200)
+                x = (random.uniform(0,401) + 200)/600
                 theta = (random.uniform(-math.pi/4, math.pi/4))
-                dx = (random.uniform(-360,360))
-                dtheta = (random.uniform(-3.17, 3.17))
+                dx = (random.uniform(-360,360))/360
+                dtheta = (random.uniform(-3.17, 3.17))/3.17
                 random_state = [x,dx,theta,dtheta]
 
                 self.set_state(random_state)
