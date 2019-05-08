@@ -2,11 +2,7 @@
 import math
 import random
 import numpy as np
-import pygame
 
-WHITE = (255,255,255)
-BROWN = (151, 84, 69)
-BLACK = (0,0,0)
 
 
 class CartPole():
@@ -38,9 +34,11 @@ class CartPole():
                 self.x_table = self.x -25
                 self.y_table = self.y -5
 
+        '''
         def draw_position(self, screen):
                 pygame.draw.line(screen, BROWN, (self.x, self.y), (self.x_stick, self.y_stick), 3)
                 pygame.draw.rect(screen, BLACK, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
+        '''
 
         def step(self, act):
                 costheta = math.cos(self.theta)
