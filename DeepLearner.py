@@ -143,9 +143,16 @@ class DeepLearner(object):
         return total_reward
 
 # Example
+'''
 rl = DeepLearner()
 
 for i in range(5):
     print("EPISODE", i+1)
     rl.episode()
     rl.play_game()
+'''
+state = np.array([[1],[2],[3],[4]])
+state2 = np.array([1,2,3,4]).reshape((4,1))
+
+print(state.shape)
+print(state2.shape)
