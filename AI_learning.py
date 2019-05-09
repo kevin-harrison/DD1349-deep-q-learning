@@ -110,7 +110,7 @@ class CartPole():
 
 
                 next_state = np.array([self.x, self.dx, self.theta, self.dtheta])
-                return next_state
+                return next_state, reward, end_state
 
         def set_state(self, state):
                 print("STATE", state.shape)
