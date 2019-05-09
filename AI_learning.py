@@ -89,16 +89,11 @@ class CartPole():
                 random_state = [x,dx,theta,dtheta]
 
                 self.set_state(random_state)
-                #normalizing
-                random_state[0] = random_state[0]/600.0
-                random_state[1] = random_state[1]/360.0
 
-                return np.ndarray((4,1), buffer=np.array(random_state))
+                return np.ndarray((1,4), buffer=np.array(random_state))
 
 
         def get_next_state(self, state, act):
-                state[0] = state[0]*600.0
-                state[1] = state[1]*360.0
 
                 self.set_state(state)
                 self.action(act)
@@ -115,16 +110,15 @@ class CartPole():
 
 
                 # Normilising the vector values.
-                next_state = np.array([self.x/600.0, self.dx/360.0, self.theta, self.dtheta])
-                state[0] = state[0]/600.0
-                state[1] = state[1]/360.0
-                return np.ndarray((4,1), buffer=next_state), reward, end_state
+                next_state = np.array([self.x, self.dx, self.theta, self.dtheta])
+                return np.ndarray((1,4), buffer=next_state), reward, end_state
 
         def set_state(self, state):
-                self.x = state[0]
-                self.dx = state[1]
-                self.theta = state[2]
-                self.dtheta = state[3]
+                print("STATE", state.shape)
+                self.x = state[0][0]
+                self.dx = state[0][1]
+                self.theta = state[0][2]
+                self.dtheta = state[0][3]
 
         def get_start_state(self):
                 self.x = 400
@@ -132,7 +126,7 @@ class CartPole():
                 self.theta = 0
                 self.dtheta = 0
 
-                return np.ndarray((4,1), buffer=np.array([400/600,0,0,0]))
+                return np.ndarray((1,4), buffer=np.array([400,0,0,0]))
 '''
         def game(self):
                 num_runs= 0
