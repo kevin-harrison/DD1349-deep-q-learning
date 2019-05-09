@@ -5,6 +5,7 @@ import copy
 from collections import deque
 from keras.models import Sequential
 from keras.layers import Dense
+import tensorflow
 
 from NeuralNetwork import Network
 from AI_learning import CartPole
@@ -23,6 +24,7 @@ class DeepLearner(object):
         self.q_network = self.create_model()
         self.target_network = self.create_model()
         self.update_target_model()
+        tf.logging.set_verbosity(tf.logging.ERROR)
 
         # Set Q learning parameters
         self.memory_replay = deque(maxlen=200) # TODO: find a better data structure that can pop first element in O(1) and access in O(1)
@@ -88,17 +90,21 @@ class DeepLearner(object):
 
     def replay(self):
         # Get minibatch targets
-        minibatch = random.sample(self.memory_replay, 128)
+        minibatch = random.sample(self.memory_replay, 50)
 
         for state, action, reward, next_state, is_end_state in minibatch:
+            # Reshape state to fit in network
+            state_vector = state.reshape((1,4))
+            next_state_vector = next_state.reshape((1,4))
+
             target = reward
             if not is_end_state:
-                prediction = self.target_network.predict(next_state)
+                prediction = self.target_network.predict(next_state_vector)
                 target = reward + (self.discount_factor * np.amax(prediction))
 
-            target_vector = self.q_network.predict(state)
-            target_vector[(action)] = target
-            self.q_network.fit(state, target_vector, epochs=1, verbose=0)
+            target_vector = self.q_network.predict(state_vector)
+            target_vector[0][action] = target
+            self.q_network.fit(state_vector, target_vector, epochs=1, verbose=0)
 
             # TEMPORARY
             if self.exploration_rate > 0:
@@ -110,7 +116,7 @@ class DeepLearner(object):
 
     def get_state_transition(self, state, i):
         # Select an action
-        actions = self.q_network.predict(state)
+        actions = self.q_network.predict(state.reshape((1,4)))
         #exploration_factor = 1 / math.sqrt(i + 1)
         #if random.uniform(0,1) > exploration_factor:
         if random.random() > self.exploration_rate:
@@ -122,36 +128,24 @@ class DeepLearner(object):
         next_state, reward, is_end_state = self.environment.get_next_state(state, action)
         return [state, action, reward, next_state, is_end_state]
 
+
     def play_game(self):
         state = self.environment.get_start_state()
         is_end_state = False
         total_reward = 0
 
         while not is_end_state:
-            action = np.argmax(self.q_network.predict(state))
+            action = np.argmax(self.q_network.predict(state.reshape((1,4))))
             state, reward, is_end_state = self.environment.get_next_state(state, action)
             total_reward += reward
 
         print(total_reward)
         return total_reward
 
-
-
 # Example
-
 rl = DeepLearner()
-rl.print()
-print()
 
-state = np.array([[1],[2],[3],[4]])
-action = rl.q_network.predict(state)
-
-print(state)
-print(action)
-'''
 for i in range(5):
     print("EPISODE", i+1)
     rl.episode()
-    rl.print()
     rl.play_game()
-'''
