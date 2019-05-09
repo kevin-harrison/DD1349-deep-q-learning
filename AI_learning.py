@@ -2,11 +2,7 @@
 import math
 import random
 import numpy as np
-import pygame
 
-WHITE = (255,255,255)
-BROWN = (151, 84, 69)
-BLACK = (0,0,0)
 
 
 class CartPole():
@@ -38,9 +34,11 @@ class CartPole():
                 self.x_table = self.x -25
                 self.y_table = self.y -5
 
+        '''
         def draw_position(self, screen):
                 pygame.draw.line(screen, BROWN, (self.x, self.y), (self.x_stick, self.y_stick), 3)
                 pygame.draw.rect(screen, BLACK, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
+        '''
 
         def step(self, act):
                 costheta = math.cos(self.theta)
@@ -64,7 +62,7 @@ class CartPole():
                 self.y_stick = self.y + self.stickHeight*math.cos(angle)
                 self.x_stick = self.x + self.stickHeight*math.sin(angle)
                 self.x_table = self.x -25
-   
+
 
 
         #Eulers fomula with one step:
@@ -91,16 +89,11 @@ class CartPole():
                 random_state = [x,dx,theta,dtheta]
 
                 self.set_state(random_state)
-                #normalizing
-                random_state[0] = random_state[0]/600.0
-                random_state[1] = random_state[1]/360.0
 
-                return np.ndarray((4,1), buffer=np.array(random_state))
+                return np.ndarray((1,4), buffer=np.array(random_state))
 
 
         def get_next_state(self, state, act):
-                state[0] = state[0]*600.0
-                state[1] = state[1]*360.0
 
                 self.set_state(state)
                 self.action(act)
@@ -108,60 +101,59 @@ class CartPole():
                 end_state = False
 
                 if (200 > (self.x_table - 3) or (self.theta > math.pi/4 or  self.theta < -math.pi/4)):
-                        reward = 0 # reward zero means that we have breaken the boundaries.
+                        reward = -100 # reward zero means that we have breaken the boundaries.
                         end_state = True
                 if (600 - self.tableWidth < (self.x_table + 3) or (self.theta > math.pi/4 or self.theta < -math.pi/4)):
                         end_state = True
-                        reward = 0 # reward zero means that we have breaken the boundaries.
+                        reward = -100 # reward zero means that we have breaken the boundaries.
                 # State is provided by the x position(1), x-velocity(2), theta(3) and theta-velocity(4).
 
 
                 # Normilising the vector values.
-                next_state = np.array([self.x/600.0, self.dx/360.0, self.theta, self.dtheta])
-                state[0] = state[0]/600.0
-                state[1] = state[1]/360.0
-                return np.ndarray((4,1), buffer=next_state), reward, end_state
+                next_state = np.array([self.x, self.dx, self.theta, self.dtheta])
+                return np.ndarray((1,4), buffer=next_state), reward, end_state
 
         def set_state(self, state):
-                self.x = state[0]
-                self.dx = state[1]
-                self.theta = state[2]
-                self.dtheta = state[3]
-                
+                print("STATE", state.shape)
+                self.x = state[0][0]
+                self.dx = state[0][1]
+                self.theta = state[0][2]
+                self.dtheta = state[0][3]
+
         def get_start_state(self):
-                self.x = 0
+                self.x = 400
                 self.dx = 0
                 self.theta = 0
                 self.dtheta = 0
-                
-                return np.ndarray((4,1), buffer=np.array([400,0,0,0]))
-'''     
+
+                return np.ndarray((1,4), buffer=np.array([400,0,0,0]))
+'''
         def game(self):
                 num_runs= 0
                 right_or_left = None
                 done = False
                 self.set_state = [0,0,0,0]
-                
+
                 while not done:
                         state = np.array([self.x/600.0, self.dx/360.0, self.theta, self.dtheta/3.17])
                         right_or_left = get_action(np.ndarray((4,1), buffer=np.array(state)))
 
-                        
+
                         # Game exit:
                         for event in pygame.event.get():
                                 if event.type == pygame.QUIT:
                                         pygame.quit()
-                        
+
                         #Fail properties left-side of path:
                         if (200 > (self.x_table - 3) or (self.theta > math.pi/4 or  self.theta < -math.pi/4)):
                                 pygame.quit()
 
-                                
+
                         #Fail properties right-side of path:
                         if (600 - self.tableWidth < (self.x_table + 3) or (self.theta > math.pi/4 or self.theta < -math.pi/4)):
                                 pygame.quit()
 
-                                
+
                         # Reseting screen:
                         screen.fill(WHITE)
                         myfont = pygame.font.SysFont("space", 40)
