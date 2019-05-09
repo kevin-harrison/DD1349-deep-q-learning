@@ -86,11 +86,11 @@ class CartPole():
                 dx = (random.uniform(-360,360))
                 theta = (random.uniform(-math.pi/4, math.pi/4))
                 dtheta = (random.uniform(-3.17, 3.17))
-                random_state = [x,dx,theta,dtheta]
+                random_state = np.array([x,dx,theta,dtheta])
 
                 self.set_state(random_state)
 
-                return np.ndarray((1,4), buffer=np.array(random_state))
+                return random_state
 
 
         def get_next_state(self, state, act):
@@ -101,24 +101,24 @@ class CartPole():
                 end_state = False
 
                 if (200 > (self.x_table - 3) or (self.theta > math.pi/4 or  self.theta < -math.pi/4)):
-                        reward = -100 # reward zero means that we have breaken the boundaries.
+                        reward = -100 # reward -100 means that we have breaken the boundaries.
                         end_state = True
                 if (600 - self.tableWidth < (self.x_table + 3) or (self.theta > math.pi/4 or self.theta < -math.pi/4)):
                         end_state = True
-                        reward = -100 # reward zero means that we have breaken the boundaries.
+                        reward = -100 # reward -100 means that we have breaken the boundaries.
                 # State is provided by the x position(1), x-velocity(2), theta(3) and theta-velocity(4).
 
 
                 # Normilising the vector values.
                 next_state = np.array([self.x, self.dx, self.theta, self.dtheta])
-                return np.ndarray((1,4), buffer=next_state), reward, end_state
+                return next_state
 
         def set_state(self, state):
                 print("STATE", state.shape)
-                self.x = state[0][0]
-                self.dx = state[0][1]
-                self.theta = state[0][2]
-                self.dtheta = state[0][3]
+                self.x = state[0]
+                self.dx = state[1]
+                self.theta = state[2]
+                self.dtheta = state[3]
 
         def get_start_state(self):
                 self.x = 400
@@ -126,7 +126,7 @@ class CartPole():
                 self.theta = 0
                 self.dtheta = 0
 
-                return np.ndarray((1,4), buffer=np.array([400,0,0,0]))
+                return np.array([self.x,self.dx, self.theta,self.dtheta])
 '''
         def game(self):
                 num_runs= 0
