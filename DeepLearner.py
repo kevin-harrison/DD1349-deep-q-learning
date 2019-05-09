@@ -1,7 +1,10 @@
 import numpy as np
 import random
 import math
+import copy
 from collections import deque
+from keras.models import Sequential
+from keras.layers import Dense
 
 from NeuralNetwork import Network
 from AI_learning import CartPole
@@ -9,28 +12,44 @@ from AI_learning import CartPole
 class DeepLearner(object):
 
     def __init__(self):
-        """
-        learning_rate and discount_factor are hyperparameters whose values are not set in stone
-        """
-        #self.learning_rate = 0.02
-        self.discount_factor = 0.8
+
+        # Create game environment
+        self.environment = CartPole()
         self.num_actions = 2
         self.num_state_variables = 4
-        self.q_network = Network([self.num_state_variables, 25, 25, self.num_actions])
-        self.environment = CartPole()
+
+        # Create Networks
+        #self.learning_rate = 0.02
+        self.q_network = self.create_model()
+        self.target_network = self.create_model()
+        self.update_target_model()
+
+        # Set Q learning parameters
         self.memory_replay = deque(maxlen=200) # TODO: find a better data structure that can pop first element in O(1) and access in O(1)
-        self.iterations = 10000
+        self.discount_factor = 0.8
+        self.iterations = 500000
         self.exploration_rate = 1
+
+
+    def create_model(self):
+        model = Sequential()
+        model.add(Dense(24, input_dim=self.num_state_variables, activation="softmax"))
+        model.add(Dense(24, activation="softmax"))
+        model.add(Dense(self.num_actions, activation="softmax"))
+        model.compile(loss="mean_squared_error", optimizer="adam")
+        return model
+
+
+    def update_target_model(self):
+        self.target_network.set_weights(self.q_network.get_weights())
+
 
     def print(self):
         """Prints out classes fields"""
         print("Memories:", len(self.memory_replay))
         print("Q-Network:")
         print(self.q_network)
-        print("Biases:")
-        print(self.q_network.biases)
-        print("Weights:")
-        print(self.q_network.weights)
+
 
     def episode(self):
         """Execute an episode of the Q learning algorithm
@@ -69,27 +88,29 @@ class DeepLearner(object):
 
     def replay(self):
         # Get minibatch targets
-        minibatch = random.sample(self.memory_replay, 32)
+        minibatch = random.sample(self.memory_replay, 128)
 
         for state, action, reward, next_state, is_end_state in minibatch:
             target = reward
             if not is_end_state:
-                prediction = self.q_network.feedforward(next_state)
+                prediction = self.target_network.predict(next_state)
                 target = reward + (self.discount_factor * np.amax(prediction))
 
-            target_vector = self.q_network.feedforward(state)
+            target_vector = self.q_network.predict(state)
             target_vector[(action)] = target
-            self.q_network.train(state, target_vector)
+            self.q_network.fit(state, target_vector, epochs=1, verbose=0)
 
             # TEMPORARY
             if self.exploration_rate > 0:
                 self.iterations -= 1
                 self.exploration_rate -= 1 / self.iterations
 
+        self.update_target_model()
+
 
     def get_state_transition(self, state, i):
         # Select an action
-        actions = self.q_network.feedforward(state)
+        actions = self.q_network.predict(state)
         #exploration_factor = 1 / math.sqrt(i + 1)
         #if random.uniform(0,1) > exploration_factor:
         if random.random() > self.exploration_rate:
@@ -107,7 +128,7 @@ class DeepLearner(object):
         total_reward = 0
 
         while not is_end_state:
-            action = np.argmax(self.q_network.feedforward(state))
+            action = np.argmax(self.q_network.predict(state))
             state, reward, is_end_state = self.environment.get_next_state(state, action)
             total_reward += reward
 
@@ -117,10 +138,17 @@ class DeepLearner(object):
 
 
 # Example
-'''
+
 rl = DeepLearner()
 rl.print()
+print()
 
+state = np.array([[1],[2],[3],[4]])
+action = rl.q_network.predict(state)
+
+print(state)
+print(action)
+'''
 for i in range(5):
     print("EPISODE", i+1)
     rl.episode()
