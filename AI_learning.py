@@ -9,7 +9,7 @@ class CartPole():
         def __init__(self):
 
                 #Generall properties:
-                self.totalMass = 1.7
+                self.totalMass = 1.1
                 self.gravity = 9.8
                 self.x = 400.0
                 self.y = 600.0
@@ -23,7 +23,7 @@ class CartPole():
                 #Stick properties:
                 self.stickWidth = 3
                 self.stickHeight = 70
-                self.stickMass = 0.7
+                self.stickMass = 0.1
                 self.x_stick = self.x -1.5
                 self.y_stick = self.y - 70
                 #Table properties:
@@ -83,9 +83,9 @@ class CartPole():
         #Methods used for the creation of the q-learning algorithm.
         def random_state(self):
                 x = (random.uniform(0,401) + 200)
-                dx = (random.uniform(-360,360))
+                dx = (random.uniform(-50,50))
                 theta = (random.uniform(-math.pi/4, math.pi/4))
-                dtheta = (random.uniform(-3.17, 3.17))
+                dtheta = (random.uniform(-1.4, 1.4))
                 random_state = np.array([x,dx,theta,dtheta])
 
                 self.set_state(random_state)
@@ -109,7 +109,6 @@ class CartPole():
                 # State is provided by the x position(1), x-velocity(2), theta(3) and theta-velocity(4).
 
 
-                # Normilising the vector values.
                 next_state = np.array([self.x, self.dx, self.theta, self.dtheta])
                 return next_state
 
