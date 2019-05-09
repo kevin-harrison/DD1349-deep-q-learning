@@ -44,7 +44,6 @@ class CartPole():
         def draw(self, screen):     
                 pygame.draw.line(screen, BROWN, (self.x, self.y), (self.x_stick, self.y_stick), 3)
                 pygame.draw.rect(screen, BLACK, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
-                print(self.theta) 
         def step(self, act):
                 costheta = math.cos(self.theta)
                 sintheta = math.sin(self.theta)
@@ -82,13 +81,15 @@ class CartPole():
                 elif act == 0:
                         self.motor_force = -300.0
                 self.step(act)
+        def get_state(self):
+                return np.ndarray((4,1), buffer=np.array([self.x,self.dx,self.theta,self.dtheta]))
   
 
 # The main loop that keeps the game running:
-def game():
+def game(human_player):
         cartpol = CartPole()
         num_runs= 0
-        right_or_left = 2
+        right_or_left = None
         done = False
 
         
@@ -98,18 +99,20 @@ def game():
                         if event.type == pygame.QUIT:
                                 pygame.quit()
                 pressed = pygame.key.get_pressed()
-                
-                #Fail properties left-side of path:
-                if (200 > (cartpol.x_table - 3) or cartpol.y_stick > 600):
-                        game()
-                if pressed[pygame.K_LEFT]:
-                        right_or_left = 0
+
+                #Fail properties left-side of path
                         
                 #Fail properties right-side of path:
-                if (600 - cartpol.tableWidth < (cartpol.x_table + 3) or (cartpol.theta > math.pi/4 or  cartpol.theta < -math.pi/4)):
-                        game()
-                if pressed[pygame.K_RIGHT]:
+                if 600 - cartpol.tableWidth < (cartpol.x_table + 3) or (cartpol.theta > math.pi/4 or  cartpol.theta < -math.pi/4) or 200 > (cartpol.x_table - 3):
+                        pygame.quit()
+                if pressed[pygame.K_RIGHT] and human_player:
                         right_or_left = 1
+                if pressed[pygame.K_LEFT] and human_player:
+                        right_or_left = 0
+                if not human_player:
+                        right_or_left = feedforward(cartpol.get_state)
+                if pressed[pygame.K_SPACE]:
+                        human_player = not human_player
                         
                 # Reseting screen:
                 screen.fill(WHITE)
@@ -122,5 +125,5 @@ def game():
                 pygame.display.update()
                 clock.tick(60)
 if __name__ == "__main__":
-    game()
+    game(True)
 
