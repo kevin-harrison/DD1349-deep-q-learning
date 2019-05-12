@@ -13,17 +13,17 @@ The rules are simple, navigate the table on the screen using left and right arro
 
 There is no finishing number of rounds, the game simply resets everytime you fail. Keep on going for as many times as you like!
 
-![picture](cartpol_graphic.PNG)
+![picture](images/cartpol_graphic.PNG)
 
 #### Physics of cartpol:
 
 While it might seem to be an easy set up, an cartpol implementation follows some advance physic implementation. From simple physics, we now that we have to apply a force to move an object. If the ground below this object is frictionless, the velocity will keep constant efter the force has been aplied. This is how the movement is controlled. Everytime you press left or right key, an force of magnitude 100 is applied to the table from the opposite side. The effect that this has on the stick can be described in the following picture:
 
-![picture](PhysicsOfCartpol.PNG)
+![picture](images/PhysicsOfCartpol.PNG)
 
 This is a lot to take in... As an summary of the easiest parts, we have the force working on the object marked with a **F**. **ux, uy,** represents the effect of this force on the stick. **uy** is later combined with the gravitational force **Gp** as the angle theta increases from its initial value zero. The system gives the following formula:
 
-![picture](FormulasForSolvingSystem.PNG)
+![picture](images/FormulasForSolvingSystem.PNG)
 
 Wich are two second degree differential equations solving the angle theta with respect to the center of the tables **x** coordinate, and the end of the stick. This system can be solved by rewritting it to an ODE-system and then Eulers formula:
 
