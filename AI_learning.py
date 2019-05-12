@@ -9,7 +9,7 @@ class CartPole():
         def __init__(self):
 
                 #Generall properties:
-                self.totalMass = 1.7
+                self.totalMass = 1.1
                 self.gravity = 9.8
                 self.x = 400.0
                 self.y = 600.0
@@ -23,7 +23,7 @@ class CartPole():
                 #Stick properties:
                 self.stickWidth = 3
                 self.stickHeight = 70
-                self.stickMass = 0.7
+                self.stickMass = 0.1
                 self.x_stick = self.x -1.5
                 self.y_stick = self.y - 70
                 #Table properties:
@@ -73,9 +73,9 @@ class CartPole():
         #Assigning a force on the table:
         def action(self, act):
                 if act == 1:
-                        self.motor_force= 300.0
+                        self.motor_force= 80.0
                 elif act == 0:
-                        self.motor_force = -300.0
+                        self.motor_force = -80.0
                 self.step(act)
 
 
@@ -83,17 +83,17 @@ class CartPole():
         #Methods used for the creation of the q-learning algorithm.
         def random_state(self):
                 x = (random.uniform(0,401) + 200)
-                dx = (random.uniform(-360,360))
+                dx = (random.uniform(-50,50))
                 theta = (random.uniform(-math.pi/4, math.pi/4))
-                dtheta = (random.uniform(-3.17, 3.17))
-                random_state = [x,dx,theta,dtheta]
-
+                dtheta = (random.uniform(-1.1, 1.1))
+                random_state = np.array([x,dx,theta,dtheta])
+                random_state = random_state.reshape((4,1))
                 self.set_state(random_state)
                 #normalizing
-                random_state[0] = random_state[0]/600.0
-                random_state[1] = random_state[1]/360.0
+                random_state[0][0] = random_state[0][0]/600.0
+                random_state[1][0] = random_state[1][0]/50.0
 
-                return np.ndarray((4,1), buffer=np.array(random_state))
+                return random_state.reshape((4,1))
 
 
         def get_next_state(self, state, act):
@@ -105,34 +105,35 @@ class CartPole():
                 reward = 1
                 end_state = False
 
-                if (200 > (self.x_table - 3) or (self.theta > math.pi/4 or  self.theta < -math.pi/4)):
+                if (200 > (self.x_table - 3) or (self.theta > math.pi/8 or  self.theta < -math.pi/8)):
                         reward = -100 # reward zero means that we have breaken the boundaries.
                         end_state = True
-                if (600 - self.tableWidth < (self.x_table + 3) or (self.theta > math.pi/4 or self.theta < -math.pi/4)):
+                if (600 - self.tableWidth < (self.x_table + 3) or (self.theta > math.pi/8 or self.theta < -math.pi/8)):
                         end_state = True
                         reward = -100 # reward zero means that we have breaken the boundaries.
                 # State is provided by the x position(1), x-velocity(2), theta(3) and theta-velocity(4).
 
 
                 # Normilising the vector values.
-                next_state = np.array([self.x/600.0, self.dx/360.0, self.theta, self.dtheta])
-                state[0] = state[0]/600.0
-                state[1] = state[1]/360.0
-                return np.ndarray((4,1), buffer=next_state), reward, end_state
+                next_state = np.array([self.x/600.0, self.dx/50.0, self.theta, self.dtheta])
+                state[0][0] = state[0][0]/600.0
+                state[0][1] = state[0][1]/50.0
+                return state.reshape((4,1))
 
         def set_state(self, state):
-                self.x = state[0]
-                self.dx = state[1]
-                self.theta = state[2]
-                self.dtheta = state[3]
+                self.x = state[0][0]
+                self.dx = state[0][1]
+                self.theta = state[0][2]
+                self.dtheta = state[0][3]
 
         def get_start_state(self):
                 self.x = 400
                 self.dx = 0
                 self.theta = 0
                 self.dtheta = 0
+                initial_state = np.array([self.x/600,dx/50,theta,dtheta])
 
-                return np.ndarray((4,1), buffer=np.array([400/600,0,0,0]))
+                return initial_state.reshape((4,1))
 '''
         def game(self):
                 num_runs= 0

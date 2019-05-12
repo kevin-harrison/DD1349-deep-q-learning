@@ -44,7 +44,7 @@ class CartPole():
         def draw(self, screen):     
                 pygame.draw.line(screen, BROWN, (self.x, self.y), (self.x_stick, self.y_stick), 3)
                 pygame.draw.rect(screen, BLACK, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
-                print(self.theta) 
+
         def step(self, act):
                 costheta = math.cos(self.theta)
                 sintheta = math.sin(self.theta)
@@ -78,9 +78,9 @@ class CartPole():
         #Assigning a force on the table:
         def action(self, act): 
                 if act == 1:
-                        self.motor_force= 300.0
+                        self.motor_force= 100.0
                 elif act == 0:
-                        self.motor_force = -300.0
+                        self.motor_force = -100.0
                 self.step(act)
   
 
