@@ -1,29 +1,53 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# temp libraries
-from collections import deque
-import random
-
 from DeepLearner import DeepLearner
+from AI_learning import CartPole
 
 class ModelTrainer(object):
 	def __init__(self):
+
+		self.game = CartPole()
+		self.state_size = 4
+		self.action_size = 2
+
 		self.models = []
 		self.training_data = []
 
 	def add_model(self):
-		self.models.append(DeepLearner())
+		self.models.append(DeepLearner(self.state_size, self.action_size))
 
-	def get_training_data(self, num_episodes):
-		self.training_data = [ [self.models[i].play_game()] for i in range(len(self.models))]
+	def get_training_data(self, num_episodes, batch_size):
+		agent = self.models[0] # TODO: Allow for training of multiple models at once
 
 		for episode in range(num_episodes):
-			for i in range(len(self.models)):
-				model = self.models[i]
-				model.episode()
-				self.training_data[i].append(model.play_game())
+			state = self.game.reset()
+			state = np.reshape(state, [1, self.state_size])
 
+			for time in range(1000):
+				self.game.render() # Comment out to train faster
+				# Get information about state change and remember it
+				action = agent.act(state)
+				next_state, reward, done = self.game.step(action)
+				reward = reward if not done else -100
+				next_state = np.reshape(next_state, [1, self.state_size])
+				agent.remember(state, action, reward, next_state, done)
+
+				state = next_state
+				if done:
+					print("episode: {}/{}, score: {}, e: {:.2}"
+						  .format(episode, num_episodes, time, agent.exploration_rate))
+					break
+
+			if not done:
+				print("WON THE GAME!")
+
+			# Train on memories gained from the game
+			if len(agent.memory) > batch_size:
+				agent.replay(batch_size)
+				agent.update_target_network()
+
+	'''
 	def plot_data(self):
 		num_models = len(self.models)
 		for i in range(num_models):
@@ -33,11 +57,11 @@ class ModelTrainer(object):
 			plt.ylabel("Score")
 
 		plt.show()
+	'''
 
 
 trainer = ModelTrainer()
 for i in range(1):
 	trainer.add_model()
 
-trainer.get_training_data(10)
-trainer.plot_data()
+trainer.get_training_data(10, 32)
