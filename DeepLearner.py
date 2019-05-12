@@ -14,10 +14,10 @@ class DeepLearner(object):
         self.state_size = state_size
         self.action_size = action_size
         self.memory = deque(maxlen=2000)
-        self.discount_factor = 0.8
+        self.discount_factor = 0.95
         self.exploration_rate = 1
         self.exploration_decay = 0.001
-        self.learning_rate = 0.0001
+        self.learning_rate = 0.001
 
         # Create Networks
         self.q_network = self.create_network()
@@ -27,9 +27,8 @@ class DeepLearner(object):
 
     def create_network(self):
         model = Sequential()
-        model.add(Dense(32, input_dim=self.state_size, activation='relu'))
-        model.add(Dense(32, activation='relu'))
-        model.add(Dense(32, activation='relu'))
+        model.add(Dense(24, input_dim=self.state_size, activation='relu'))
+        model.add(Dense(24, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse',
                       optimizer=optimizers.Adam(lr=self.learning_rate))
@@ -59,7 +58,8 @@ class DeepLearner(object):
             target = reward
             if not done:
                 Q_next=self.target_network.predict(next_state)[0]
-                target = (reward + self.discount_factor *np.amax(Q_next))
+                target = reward + (self.discount_factor * \
+                    np.amax(Q_next))
 
             target_f = self.q_network.predict(state)
             target_f[0][action] = target
