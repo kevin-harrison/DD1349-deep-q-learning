@@ -25,7 +25,7 @@ class ModelTrainer(object):
 			state = np.reshape(state, [1, self.state_size])
 
 			for time in range(1000):
-				self.game.render() # Comment out to train faster
+				#self.game.render() # Comment out to train faster
 				# Get information about state change and remember it
 				action = agent.act(state)
 				next_state, reward, done = self.game.step(action)

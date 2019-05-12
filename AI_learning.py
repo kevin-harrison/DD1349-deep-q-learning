@@ -7,9 +7,8 @@ import pygame
 WHITE = (255,255,255)
 BROWN = (151, 84, 69)
 BLACK = (0,0,0)
-screen = pygame.display.set_mode((800, 800))
-pygame.init()
-clock = pygame.time.Clock()
+
+
 
 class CartPole():
         def __init__(self):
@@ -39,9 +38,16 @@ class CartPole():
                 self.acc_time = 0.2
                 self.x_table = self.x -25
                 self.y_table = self.y -5
+                #Toggles first render
+                self.rendering = False
 
 
         def render(self):
+                if not self.rendering:
+                        self.rendering = True
+                        screen = pygame.display.set_mode((800, 800))
+                        pygame.init()
+
                 screen.fill(WHITE)
                 pygame.draw.line(screen, BROWN, (self.x, self.y), (self.x_stick, self.y_stick), 3)
                 pygame.draw.rect(screen, BLACK, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
