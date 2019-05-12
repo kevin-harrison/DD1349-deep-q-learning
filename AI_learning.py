@@ -7,7 +7,7 @@ import pygame
 WHITE = (255,255,255)
 BROWN = (151, 84, 69)
 BLACK = (0,0,0)
-
+screen = pygame.display.set_mode((800, 800))
 
 
 class CartPole():
@@ -45,7 +45,6 @@ class CartPole():
         def render(self):
                 if not self.rendering:
                         self.rendering = True
-                        screen = pygame.display.set_mode((800, 800))
                         pygame.init()
 
                 screen.fill(WHITE)

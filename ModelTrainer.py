@@ -26,7 +26,7 @@ class ModelTrainer(object):
 			done = False
 
 			for time in range(500):
-				#self.game.render() # Comment out to train faster
+				self.game.render() # Comment out to train faster
 				# Get information about state change and remember it
 				action = agent.act(state)
 				next_state, reward, done = self.game.step(action)
