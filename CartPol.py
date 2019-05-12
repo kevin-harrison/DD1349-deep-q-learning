@@ -78,9 +78,9 @@ class CartPole():
         #Assigning a force on the table:
         def action(self, act): 
                 if act == 1:
-                        self.motor_force= 100.0
+                        self.motor_force= 80.0
                 elif act == 0:
-                        self.motor_force = -100.0
+                        self.motor_force = -80.0
                 self.step(act)
   
 
