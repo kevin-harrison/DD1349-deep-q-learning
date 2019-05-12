@@ -15,8 +15,9 @@ class DeepLearner(object):
         self.action_size = action_size
         self.memory = deque(maxlen=2000)
         self.discount_factor = 0.95
-        self.exploration_rate = 1
-        self.exploration_decay = 0.001
+        self.exploration_rate = 1.0
+        self.exploration_min = 0.01
+        self.exploration_decay = 0.9999
         self.learning_rate = 0.001
 
         # Create Networks
@@ -45,7 +46,6 @@ class DeepLearner(object):
 
     def act(self, state):
         if np.random.rand() <= self.exploration_rate:
-            self.exploration_rate -= self.exploration_decay
             return random.randrange(self.action_size)
         act_values = self.q_network.predict(state)
         return np.argmax(act_values[0])
@@ -58,10 +58,11 @@ class DeepLearner(object):
             target = reward
             if not done:
                 Q_next=self.target_network.predict(next_state)[0]
-                target = reward + (self.discount_factor * \
-                    np.amax(Q_next))
+                target = reward + (self.discount_factor * np.amax(Q_next))
 
             target_f = self.q_network.predict(state)
             target_f[0][action] = target
             #train network
             self.q_network.fit(state, target_f, epochs=1, verbose=0)
+        if self.exploration_rate > self.exploration_min:
+            self.exploration_rate *= self.exploration_decay
