@@ -4,6 +4,7 @@ from collections import deque
 
 from keras.models import Sequential
 from keras.layers import Dense
+from keras import optimizers
 
 class DeepLearner(object):
 
@@ -21,7 +22,7 @@ class DeepLearner(object):
         # Create Networks
         self.q_network = self.create_network()
         self.target_network = self.create_network()
-        self.update_target_model()
+        self.update_target_network()
 
 
     def create_network(self):
@@ -40,14 +41,14 @@ class DeepLearner(object):
 
 
     def remember(self, state, action, reward, next_state, is_done):
-        self.memory.append((state, action, reward, next_state, done))
+        self.memory.append((state, action, reward, next_state, is_done))
 
 
     def act(self, state):
-        if np.random.rand() <= self.epsilon:
-            self.epsilon -= self.epsilon_decay
+        if np.random.rand() <= self.exploration_rate:
+            self.exploration_rate -= self.exploration_decay
             return random.randrange(self.action_size)
-        act_values = self.model.predict(state)
+        act_values = self.q_network.predict(state)
         return np.argmax(act_values[0])
 
 
@@ -58,9 +59,9 @@ class DeepLearner(object):
             target = reward
             if not done:
                 Q_next=self.target_network.predict(next_state)[0]
-                target = (reward + self.gamma *np.amax(Q_next))
+                target = (reward + self.discount_factor *np.amax(Q_next))
 
             target_f = self.q_network.predict(state)
             target_f[0][action] = target
             #train network
-            self.model.fit(state, target_f, epochs=1, verbose=0)
+            self.q_network.fit(state, target_f, epochs=1, verbose=0)
