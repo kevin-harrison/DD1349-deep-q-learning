@@ -1,15 +1,21 @@
-
 import math
 import random
 import numpy as np
+import pygame
 
 
+WHITE = (255,255,255)
+BROWN = (151, 84, 69)
+BLACK = (0,0,0)
+screen = pygame.display.set_mode((800, 800))
+pygame.init()
+clock = pygame.time.Clock()
 
 class CartPole():
         def __init__(self):
 
                 #Generall properties:
-                self.totalMass = 1.1
+                self.totalMass = 1.7
                 self.gravity = 9.8
                 self.x = 400.0
                 self.y = 600.0
@@ -23,7 +29,7 @@ class CartPole():
                 #Stick properties:
                 self.stickWidth = 3
                 self.stickHeight = 70
-                self.stickMass = 0.1
+                self.stickMass = 0.7
                 self.x_stick = self.x -1.5
                 self.y_stick = self.y - 70
                 #Table properties:
@@ -34,13 +40,19 @@ class CartPole():
                 self.x_table = self.x -25
                 self.y_table = self.y -5
 
-        '''
-        def draw_position(self, screen):
+
+        def render(self):
+                screen.fill(WHITE)
                 pygame.draw.line(screen, BROWN, (self.x, self.y), (self.x_stick, self.y_stick), 3)
                 pygame.draw.rect(screen, BLACK, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
-        '''
+                pygame.display.update()
 
         def step(self, act):
+                if act == 1:
+                        self.motor_force= 300.0
+                elif act == 0:
+                        self.motor_force = -300.0
+
                 costheta = math.cos(self.theta)
                 sintheta = math.sin(self.theta)
                 #ODE-system implementation for solving differential equations in FormulasForSolvingSystem.PNG:
@@ -63,6 +75,20 @@ class CartPole():
                 self.x_stick = self.x + self.stickHeight*math.sin(angle)
                 self.x_table = self.x -25
 
+                # Check if game is in an end state
+                reward = 1
+                end_state = False
+
+                if (200 > (self.x_table - 3) or (self.theta > math.pi/4 or  self.theta < -math.pi/4)):
+                        reward = -100 # reward zero means that we have breaken the boundaries.
+                        end_state = True
+                if (600 - self.tableWidth < (self.x_table + 3) or (self.theta > math.pi/4 or self.theta < -math.pi/4)):
+                        end_state = True
+                        reward = -100 # reward zero means that we have breaken the boundaries.
+
+                next_state = [self.x, self.dx, self.theta, self.dtheta]
+                return next_state, reward, end_state
+
 
 
         #Eulers fomula with one step:
@@ -70,96 +96,15 @@ class CartPole():
                 value = value + self.eulerStep*dvalue
                 return value
 
-        #Assigning a force on the table:
-        def action(self, act):
-                if act == 1:
-                        self.motor_force= 300.0
-                elif act == 0:
-                        self.motor_force = -300.0
-                self.step(act)
+        def reset(self):
+                self.x = 400.0
+                self.y = 600.0
+                self.dx = 0.0
+                self.d2x = 0.0
+                self.theta = 0.0
+                self.dtheta = 0.0
+                self.d2theta = 0.0
+                self.eulerStep = 0.02
+                self.motor_force = 0
 
-
-
-        #Methods used for the creation of the q-learning algorithm.
-        def random_state(self):
-                x = (random.uniform(0,401) + 200)
-                dx = (random.uniform(-50,50))
-                theta = (random.uniform(-math.pi/4, math.pi/4))
-                dtheta = (random.uniform(-1.4, 1.4))
-                random_state = np.array([x,dx,theta,dtheta])
-
-                self.set_state(random_state)
-
-                return random_state
-
-
-        def get_next_state(self, state, act):
-
-                self.set_state(state)
-                self.action(act)
-                reward = 1
-                end_state = False
-
-                if (200 > (self.x_table - 3) or (self.theta > math.pi/4 or  self.theta < -math.pi/4)):
-                        reward = -100 # reward -100 means that we have breaken the boundaries.
-                        end_state = True
-                if (600 - self.tableWidth < (self.x_table + 3) or (self.theta > math.pi/4 or self.theta < -math.pi/4)):
-                        end_state = True
-                        reward = -100 # reward -100 means that we have breaken the boundaries.
-                # State is provided by the x position(1), x-velocity(2), theta(3) and theta-velocity(4).
-
-
-                next_state = np.array([self.x, self.dx, self.theta, self.dtheta])
-                return next_state, reward, end_state
-
-        def set_state(self, state):
-                self.x = state[0]
-                self.dx = state[1]
-                self.theta = state[2]
-                self.dtheta = state[3]
-
-        def get_start_state(self):
-                self.x = 400
-                self.dx = 0
-                self.theta = 0
-                self.dtheta = 0
-
-                return np.array([self.x,self.dx, self.theta,self.dtheta])
-'''
-        def game(self):
-                num_runs= 0
-                right_or_left = None
-                done = False
-                self.set_state = [0,0,0,0]
-
-                while not done:
-                        state = np.array([self.x/600.0, self.dx/360.0, self.theta, self.dtheta/3.17])
-                        right_or_left = get_action(np.ndarray((4,1), buffer=np.array(state)))
-
-
-                        # Game exit:
-                        for event in pygame.event.get():
-                                if event.type == pygame.QUIT:
-                                        pygame.quit()
-
-                        #Fail properties left-side of path:
-                        if (200 > (self.x_table - 3) or (self.theta > math.pi/4 or  self.theta < -math.pi/4)):
-                                pygame.quit()
-
-
-                        #Fail properties right-side of path:
-                        if (600 - self.tableWidth < (self.x_table + 3) or (self.theta > math.pi/4 or self.theta < -math.pi/4)):
-                                pygame.quit()
-
-
-                        # Reseting screen:
-                        screen.fill(WHITE)
-                        myfont = pygame.font.SysFont("space", 40)
-                        label = myfont.render("number runs: " + str(num_runs), 1, (BLACK))
-                        screen.blit(label, (320, 700))
-                        self.action(right_or_left)
-                        num_runs += 1
-                        path = pygame.draw.line(screen, BLACK, (200,600), (600,600), 1)
-                        pygame.display.update()
-                        clock.tick(60)
-'''
+                return [self.x, self.dx, self.theta, self.dtheta]
