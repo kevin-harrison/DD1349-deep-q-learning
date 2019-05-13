@@ -4,10 +4,6 @@ import math
 from collections import deque
 
 
-WHITE = (255,255,255)
-BROWN = (151, 84, 69)
-BLACK = (0,0,0)
-
 class SnakeGame:
 	def __init__(self, size):
 		self.size = size
@@ -31,7 +27,7 @@ class SnakeGame:
 			pygame.init()
 
 		# Draw rectangles for snake and apple
-		self.screen.fill(BLACK)
+		self.screen.fill((0,0,0))
 		pygame.draw.rect(self.screen, (244, 66, 66), pygame.Rect(self.apple[1]*50, self.apple[0]*50, 50, 50))
 		print(self.apple)
 		for snake in self.snake:
@@ -87,7 +83,7 @@ class SnakeGame:
 
 		#print(self.global_state)
 		self.print_state()
-
+		return self.global_state
 
 
 	def set_state(self):
@@ -137,7 +133,7 @@ class SnakeGame:
 			print(row)
 
 
-s = SnakeGame(3)
+s = SnakeGame(18)
 s.render()
 input()
 s.step(1)

@@ -7,8 +7,47 @@ from keras.layers import Dense
 from keras import optimizers
 
 class DeepLearner(object):
+    """Deep Q Learning agent
+
+    Agent that uses deep q learning to interact with an environment(game)
+    by giving it actions. When the environment returns the new state and
+    reward agent should learn how to choose actions which maximize the
+    reward returned.
+
+    Attributes
+    ----------
+    memory : deque
+        Stores information about the rewards actions taken during a certain
+        state gave. Used to decorellate game trajectory with training
+    discount_factor : double
+        How much to discount the value of future rewards
+    exporation_rate : double
+        Percent chance that agents choose a random action instead of trying
+        to choose the optimal action
+    exploration_min : double
+        min value exploration_rate can become
+    exploration_decay : double
+        multiplied to exploration_rate to decrease it over time
+    learning_rate : double
+        hyperparameter for neural networks
+    q_network : keras.Sequential
+        Neural network that takes a game state as an input and outputs the
+        predicted rewards of each action for that state
+    target_network : keras.Sequential
+        A network used to create the TD-targets for Q learning. Used to
+        stabilize the targets and therefore training
+    """
 
     def __init__(self, state_size, action_size):
+        """
+        Parameters
+        ----------
+        state_size : int
+            The length of the vector required to represent the game state
+        action_size : int
+            The length of the vector required to represent all possible actions
+            the agent can take
+        """
 
         # Set Q learning parameters
         self.state_size = state_size
@@ -27,6 +66,8 @@ class DeepLearner(object):
 
 
     def create_network(self):
+        # Creates a neural network using the keras module
+
         model = Sequential()
         model.add(Dense(24, input_dim=self.state_size, activation='relu'))
         model.add(Dense(24, activation='relu'))
@@ -37,14 +78,21 @@ class DeepLearner(object):
 
 
     def update_target_network(self):
+        # Sets target_network's weights equal to q_network's weights
+
         self.target_network.set_weights(self.q_network.get_weights())
 
 
     def remember(self, state, action, reward, next_state, is_done):
+        # Adds a state transition to the agent's memory replay
+
         self.memory.append((state, action, reward, next_state, is_done))
 
 
     def act(self, state):
+        # Consults the q_network to return the action with the best predicted
+        # reward or with chance exploration_rate chooses a random action
+
         if np.random.rand() <= self.exploration_rate:
             return random.randrange(self.action_size)
         act_values = self.q_network.predict(state)
@@ -52,6 +100,10 @@ class DeepLearner(object):
 
 
     def replay(self, batch_size):
+        # Selects a number of transistions from memory replay, creates TD-targets
+        # and trains on the mean-squared error between the target and q_network
+        # prediction. Also decreased exploration_rate
+
         #sample random transitions
         minibatch = random.sample(self.memory, batch_size)
         for state, action, reward, next_state, done in minibatch:
