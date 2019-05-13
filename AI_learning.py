@@ -14,7 +14,7 @@ class CartPole():
         def __init__(self):
 
                 #Generall properties:
-                self.totalMass = 1.7
+                self.totalMass = 1.1
                 self.gravity = 9.8
                 self.x = 400.0
                 self.y = 600.0
@@ -28,7 +28,7 @@ class CartPole():
                 #Stick properties:
                 self.stickWidth = 3
                 self.stickHeight = 70
-                self.stickMass = 0.7
+                self.stickMass = 0.1
                 self.x_stick = self.x -1.5
                 self.y_stick = self.y - 70
                 #Table properties:
@@ -55,9 +55,9 @@ class CartPole():
 
         def step(self, act):
                 if act == 1:
-                        self.motor_force= 300.0
+                        self.motor_force= 80.0
                 elif act == 0:
-                        self.motor_force = -300.0
+                        self.motor_force = -80.0
 
                 costheta = math.cos(self.theta)
                 sintheta = math.sin(self.theta)
@@ -85,10 +85,10 @@ class CartPole():
                 reward = 1
                 end_state = False
 
-                if (200 > (self.x_table - 3) or (self.theta > math.pi/4 or  self.theta < -math.pi/4)):
+                if (200 > (self.x_table - 3) or (self.theta > math.pi/9 or  self.theta < -math.pi/9)):
                         reward = -100 # reward zero means that we have breaken the boundaries.
                         end_state = True
-                if (600 - self.tableWidth < (self.x_table + 3) or (self.theta > math.pi/4 or self.theta < -math.pi/4)):
+                if (600 - self.tableWidth < (self.x_table + 3) or (self.theta > math.pi/9 or self.theta < -math.pi/9)):
                         end_state = True
                         reward = -100 # reward zero means that we have breaken the boundaries.
 
