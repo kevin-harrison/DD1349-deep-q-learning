@@ -56,7 +56,7 @@ class DeepLearner(object):
         self.discount_factor = 0.95
         self.exploration_rate = 1.0
         self.exploration_min = 0.01
-        self.exploration_decay = 0.9999
+        self.exploration_decay = 0.995
         self.learning_rate = 0.001
 
         # Create Networks
@@ -107,11 +107,11 @@ class DeepLearner(object):
         #sample random transitions
         minibatch = random.sample(self.memory, batch_size)
         for state, action, reward, next_state, done in minibatch:
+            # Create TD-target
             target = reward
             if not done:
                 Q_next=self.target_network.predict(next_state)[0]
                 target = reward + (self.discount_factor * np.amax(Q_next))
-
             target_f = self.q_network.predict(state)
             target_f[0][action] = target
             #train network
