@@ -9,27 +9,19 @@ class SnakeGame:
 		self.size = size
 		self.state_size = size * size
 		self.action_size = 3
-		self.rendering = False
 		self.reset()
 		self.relative_directions = {"left":["down","left", "up"],
 									"right":["up", "right", "down"],
 									"up":["left", "up", "right"],
-									"down":["right", "down", "up"]
+									"down":["right", "down", "left"]
 									}
 		self.screen = pygame.display.set_mode((self.size*50, self.size*50))
-
+		pygame.init()
 
 	def render(self):
-		# Only init pygame if first time rendering
-		if not self.rendering:
-			self.rendering = True
-
-			pygame.init()
-
 		# Draw rectangles for snake and apple
 		self.screen.fill((0,0,0))
 		pygame.draw.rect(self.screen, (244, 66, 66), pygame.Rect(self.apple[1]*50, self.apple[0]*50, 50, 50))
-		print(self.apple)
 		for snake in self.snake:
 			pygame.draw.rect(self.screen, (255, 255, 255), pygame.Rect(snake[1]*50, snake[0]*50, 50, 50))
 		pygame.display.update()
@@ -37,40 +29,57 @@ class SnakeGame:
 
 	def step(self, act):
 		end_state = False
-		reward = 0
+		reward = -1
+		previous_head = self.snake[0]
+		tail = None
 
 		# Get next coords of snakes head
 		self.direction = self.relative_directions[self.direction][act]
 		if self.direction == "left":
-			new_head = (self.snake[0][0], self.snake[0][1]-1)
+			new_head = (previous_head[0], previous_head[1]-1)
 		elif self.direction == "right":
-			new_head = (self.snake[0][0], self.snake[0][1]+1)
+			new_head = (previous_head[0], previous_head[1]+1)
 		elif self.direction == "up":
-			new_head = (self.snake[0][0], self.snake[0][1]-1)
+			new_head = (previous_head[0]-1, previous_head[1])
 		elif self.direction == "down":
-			new_head = (self.snake[0][0], self.snake[0][1]+1)
-
-		# Check if eaten apple
-		if new_head == self.apple:
-			reward = 100
-			self.place_apple()
-			self.snake.maxlen += 1 # TODO: doesn't work
+			new_head = (previous_head[0]+1, previous_head[1])
 
 		# Check boundaries
 		if new_head[0] < 0 or new_head[0] >= self.size or new_head[1] < 0 or new_head[1] >= self.size:
 			end_state = True
+			print("Out of bounds")
+
+		# Check if moved into itself
+		new_head_coords = (new_head[0]*self.size + new_head[1]) * 4
+		encoded_coord = self.global_state[new_head_coords:new_head_coords+4]
+		if encoded_coord == [0,0,0,1]:
+			reward = 0
+			end_state = True
+			print("Ate self")
 
 		# Move snake
-		self.snake.append(new_head)
-		next_state = self.set_state()
+		if not end_state:
+			self.snake.appendleft(new_head) # append left?
+			if self.snake_size < len(self.snake):
+				tail = self.snake.pop()
 
+			# Check if eaten apple
+			if new_head == self.apple:
+				reward = 100
+				self.place_apple()
+				self.snake_size += 1
+
+
+			self.set_state(new_head, previous_head, tail)
+		next_state = self.global_state
 		return next_state, reward, end_state
 
 	def reset(self):
 
 		# Create snake
 		snake_start = (math.ceil(self.size/2)-1, math.ceil(self.size/2)-1)
-		self.snake = deque(maxlen=1)
+		self.snake = deque()
+		self.snake_size = 1
 		self.snake.append(snake_start)
 		self.direction = "right"
 
@@ -79,23 +88,29 @@ class SnakeGame:
 
 		# Calculate game state
 		self.global_state = [1 if (i+3)%4 == 0 else 0 for i in range(self.size * self.size*4)]
-		self.set_state()
-
-		#print(self.global_state)
-		self.print_state()
+		self.set_state(snake_start, (snake_start[0], snake_start[1]-1), None)
 		return self.global_state
 
 
-	def set_state(self):
+	def set_state(self, head, previous_head, tail):
 
-		# Change snake's state
-		head_coord = (self.snake[0][0]*self.size + self.snake[0][1])* 4
-		end_coord = (self.snake[len(self.snake)-1][0]*self.size + self.snake[len(self.snake)-1][1])* 4
-		if len(self.snake) > 1:
-			previous_head_coord = (self.snake[1][0]*self.size + self.snake[1][1])* 4
-			self.global_state[previous_head_coord:previous_head_coord+3] = [0,0,0,1]
-		self.global_state[end_coord:end_coord+4] = [0,1,0,0]
+		# Get coordinates of changes
+		head_coord = (head[0]*self.size + head[1])* 4
+		previous_head_coord = (previous_head[0]*self.size + previous_head[1])* 4
+
+		# Change snake's head state
 		self.global_state[head_coord:head_coord+4] = [0,0,1,0]
+
+		# Change snake's body state
+		if len(self.snake) > 1:
+			self.global_state[previous_head_coord:previous_head_coord+4] = [0,0,0,1]
+		else:
+			self.global_state[previous_head_coord:previous_head_coord+4] = [0,1,0,0]
+
+		# Remove end of body state
+		if tail != None:
+			end_coord = (tail[0]*self.size + tail[1])* 4
+			self.global_state[end_coord:end_coord+4] = [0,1,0,0]
 
 		# Change apple's state
 		apple_coord = (self.apple[0]*self.size + self.apple[1])*4
@@ -132,10 +147,16 @@ class SnakeGame:
 					row.append("B")
 			print(row)
 
+'''
+s = SnakeGame(16)
 
-s = SnakeGame(18)
-s.render()
-input()
-s.step(1)
-s.render()
-input()
+while True:
+	s.reset()
+	done = False
+	while not done:
+		#action = int(input()) - 1
+		#_, _, done = s.step(action)
+
+		_, _, done = s.step(random.randrange(3))
+		s.render()
+'''
