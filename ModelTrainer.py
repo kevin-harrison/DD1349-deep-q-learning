@@ -3,6 +3,7 @@ import numpy as np
 
 from DeepLearner import DeepLearner
 from AI_learning import CartPole
+from SnakeGame import SnakeGame
 
 class ModelTrainer(object):
 	"""Facilitates training of DeepLearner agents
@@ -30,9 +31,9 @@ class ModelTrainer(object):
 	def __init__(self):
 
 		# Game attributes
-		self.game = CartPole() # TODO: add more games
-		self.state_size = 4
-		self.action_size = 2
+		self.game = SnakeGame(8) # TODO: add more games
+		self.state_size = 8*8*4
+		self.action_size = 3
 
 		# Training attributes
 		self.models = []
@@ -53,14 +54,16 @@ class ModelTrainer(object):
 			state = self.game.reset() # Sets game to starting state
 			state = np.reshape(state, [1, self.state_size])
 			done = False
+			total_reward = 0
 
-			for time in range(500):
+			for time in range(1000):
 				self.game.render() # Comment out to train faster
 
 				# Get information about state change and remember it
 				action = agent.act(state)
 				next_state, reward, done = self.game.step(action)
-				reward = reward if not done else -10
+				reward = reward if not done else -100
+				total_reward += reward
 				next_state = np.reshape(next_state, [1, self.state_size])
 				agent.remember(state, action, reward, next_state, done)
 				state = next_state
@@ -68,8 +71,8 @@ class ModelTrainer(object):
 				# If the game is lost print out some stats of the training session
 				if done:
 					agent.update_target_network()
-					print("episode: {}/{}, score: {}, e: {:.2}"
-						  .format(episode, num_episodes, time, agent.exploration_rate))
+					print("episode: {}/{}, time: {}, reward: {}, e: {:.2}"
+						  .format(episode, num_episodes, time, total_reward, agent.exploration_rate))
 					break
 
 				# Train on memories of from the game
