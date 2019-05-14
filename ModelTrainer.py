@@ -32,23 +32,19 @@ class ModelTrainer(object):
 
 		# Game attributes
 		self.game = SnakeGame(8) # TODO: add more games
-		self.state_size = 8*8*4
-		self.action_size = 3
+		self.state_size = self.game.state_size
+		self.action_size = self.game.action_size
 
 		# Training attributes
-		self.models = []
-		self.training_data = []
-
-	def add_model(self):
-		# Adds a DeepLearner agent to models
-
-		self.models.append(DeepLearner(self.state_size, self.action_size))
+		self.model = DeepLearner(self.state_size, self.action_size)
+		self.training_rewards = []
+		self.training_times = []
 
 	def get_training_data(self, num_episodes, batch_size):
 		# Trains the agents on the game num_episodes times. Also
 		# renders the game at each state
 
-		agent = self.models[0] # TODO: Allow for training of multiple models at once
+		agent = self.model # TODO: Allow for training of multiple models at once
 
 		for episode in range(num_episodes):
 			state = self.game.reset() # Sets game to starting state
@@ -62,7 +58,7 @@ class ModelTrainer(object):
 				# Get information about state change and remember it
 				action = agent.act(state)
 				next_state, reward, done = self.game.step(action)
-				reward = reward if not done else -100
+				reward = reward if not done else -0.5
 				total_reward += reward
 				next_state = np.reshape(next_state, [1, self.state_size])
 				agent.remember(state, action, reward, next_state, done)
@@ -70,6 +66,8 @@ class ModelTrainer(object):
 
 				# If the game is lost print out some stats of the training session
 				if done:
+					self.training_rewards.append(total_reward)
+					self.training_times.append(time)
 					agent.update_target_network()
 					print("episode: {}/{}, time: {}, reward: {}, e: {:.2}"
 						  .format(episode, num_episodes, time, total_reward, agent.exploration_rate))
@@ -82,21 +80,19 @@ class ModelTrainer(object):
 			if not done:
 				print("WON THE GAME!")
 
-	'''
-	def plot_data(self):
-		num_models = len(self.models)
-		for i in range(num_models):
-			plt.subplot(num_models, 1, i+1)
-			plt.plot(np.arange(len(self.training_data[0])), self.training_data[i], "o-")
-			plt.xlabel("Episodes")
-			plt.ylabel("Score")
 
+	def plot_data(self):
+		plt.subplot(2, 1, 1)
+		plt.plot(np.arange(len(self.training_rewards)), self.training_rewards, "-")
+		#plt.xlabel("Episodes")
+		plt.ylabel("Score")
+		plt.subplot(2, 1, 2)
+		plt.plot(np.arange(len(self.training_times)), self.training_times, "-")
+		plt.xlabel("Episodes")
+		plt.ylabel("Time alive")
 		plt.show()
-	'''
 
 
 trainer = ModelTrainer()
-for i in range(1):
-	trainer.add_model()
-
-trainer.get_training_data(1000, 32)
+trainer.get_training_data(300, 32)
+trainer.plot_data()

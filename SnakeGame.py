@@ -7,7 +7,7 @@ from collections import deque
 class SnakeGame:
 	def __init__(self, size):
 		self.size = size
-		self.state_size = size * size
+		self.state_size = (self.size * self.size*4) + 7
 		self.action_size = 3
 		self.reset()
 		self.relative_directions = {"left":["down","left", "up"],
@@ -29,7 +29,7 @@ class SnakeGame:
 
 	def step(self, act):
 		end_state = False
-		reward = -1
+		reward = -0.005
 		previous_head = self.snake[0]
 		tail = None
 
@@ -47,15 +47,15 @@ class SnakeGame:
 		# Check boundaries
 		if new_head[0] < 0 or new_head[0] >= self.size or new_head[1] < 0 or new_head[1] >= self.size:
 			end_state = True
-			print("Out of bounds")
+			#print("Out of bounds")
 
 		# Check if moved into itself
 		new_head_coords = (new_head[0]*self.size + new_head[1]) * 4
 		encoded_coord = self.global_state[new_head_coords:new_head_coords+4]
 		if encoded_coord == [0,0,0,1]:
-			reward = 0
+			reward = -0.5
 			end_state = True
-			print("Ate self")
+			#print("Ate self")
 
 		# Move snake
 		if not end_state:
@@ -65,7 +65,7 @@ class SnakeGame:
 
 			# Check if eaten apple
 			if new_head == self.apple:
-				reward = 100
+				reward = 1
 				self.place_apple()
 				self.snake_size += 1
 
@@ -87,7 +87,8 @@ class SnakeGame:
 		self.place_apple()
 
 		# Calculate game state
-		self.global_state = [1 if (i+3)%4 == 0 else 0 for i in range(self.size * self.size*4)]
+		self.global_state = [1 if (i+3)%4 == 0 else 0 for i in range((self.size * self.size*4) + 7)]
+		self.local_state = [0,0,0,0,0,0,0]
 		self.set_state(snake_start, (snake_start[0], snake_start[1]-1), None)
 		return self.global_state
 
@@ -116,7 +117,59 @@ class SnakeGame:
 		apple_coord = (self.apple[0]*self.size + self.apple[1])*4
 		self.global_state[apple_coord:apple_coord+4] = [1,0,0,0]
 
-		# Change local state
+		# Change local state (relative to direction)
+		if self.direction == "right":
+			self.local_state[:4] = [1,0,0,0]
+			left_sensor = (head[0]-1, head[1])
+			front_sensor = (head[0], head[1]+1)
+			right_sensor = (head[0]+1, head[1])
+		if self.direction == "left":
+			self.local_state[:4] = [0,1,0,0]
+			left_sensor = (head[0]+1, head[1])
+			front_sensor = (head[0], head[1]-1)
+			right_sensor = (head[0]-1, head[1])
+		if self.direction == "up":
+			self.local_state[:4] = [0,0,1,0]
+			left_sensor = (head[0], head[1]-1)
+			front_sensor = (head[0]-1, head[1])
+			right_sensor = (head[0], head[1]+1)
+		if self.direction == "down":
+			self.local_state[:4] = [0,0,0,1]
+			left_sensor = (head[0], head[1]+1)
+			front_sensor = (head[0]+1, head[1])
+			right_sensor = (head[0], head[1]-1)
+
+
+		# Change local state of sensors
+		self.local_state[4:] = [0,0,0]
+		# left sensor
+		if self.out_of_bounds(left_sensor):
+			self.local_state[4] = 1
+		else:
+			left_sensor = self.convert_coord(left_sensor)
+			encoded_coord = self.global_state[left_sensor:left_sensor+4]
+			if encoded_coord == [0,0,0,1]:
+				self.local_state[4] = 1
+		# front sensor
+		if self.out_of_bounds(front_sensor):
+			self.local_state[5] = 1
+		else:
+			front_sensor = self.convert_coord(front_sensor)
+			encoded_coord = self.global_state[front_sensor:front_sensor+4]
+			if encoded_coord == [0,0,0,1]:
+				self.local_state[5] = 1
+		# right sensor
+		if self.out_of_bounds(right_sensor):
+			self.local_state[6] = 1
+		else:
+			right_sensor = self.convert_coord(right_sensor)
+			encoded_coord = self.global_state[right_sensor:right_sensor+4]
+			if encoded_coord == [0,0,0,1]:
+				self.local_state[6] = 1
+
+		self.global_state[-7:] = self.local_state
+
+
 
 	def place_apple(self):
 		apple_coords = (random.randrange(self.size), random.randrange(self.size))
@@ -129,6 +182,17 @@ class SnakeGame:
 			else:
 				collision = False
 		self.apple = apple_coords
+
+
+	def convert_coord(self, xy_tuple):
+		return (xy_tuple[0]*self.size + xy_tuple[1]) * 4
+
+
+	def out_of_bounds(self, xy_tuple):
+		if xy_tuple[0] < 0 or xy_tuple[0] >= self.size or xy_tuple[1] < 0 or xy_tuple[1] >= self.size:
+			return True
+		else:
+			return False
 
 
 	def print_state(self):
@@ -146,9 +210,15 @@ class SnakeGame:
 				elif state == [0,0,0,1]:
 					row.append("B")
 			print(row)
+		print("Direction:", self.local_state[0:4])
+		print("Danger left:", self.local_state[4])
+		print("Danger front:", self.local_state[5])
+		print("Danger right:", self.local_state[6])
 
-'''
-s = SnakeGame(16)
+
+
+"""
+s = SnakeGame(8)
 
 while True:
 	s.reset()
@@ -159,4 +229,4 @@ while True:
 
 		_, _, done = s.step(random.randrange(3))
 		s.render()
-'''
+"""
