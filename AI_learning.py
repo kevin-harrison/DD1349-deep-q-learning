@@ -3,14 +3,42 @@ import random
 import numpy as np
 import pygame
 
-
+# Colors for the canvas drawings. 
 WHITE = (255,255,255)
 BROWN = (151, 84, 69)
 BLACK = (0,0,0)
 screen = pygame.display.set_mode((800, 800))
 
-
 class CartPole():
+   """Cartpol agent
+
+    Cartpol is the physical envirement for the cartpol game. This enviremont is u
+    used to give the calculations of the state dependent on the given action. The
+    q-network is combined with the cartpol using an "state to action relation". So the
+    training is initialized by the cartpol providing its state, and the q-network to
+    give back its predicted action updating its state.
+
+    Attributes
+    ----------
+    totalMass, stickMass, table Mass: double
+        Stores the mass of stick that is balanced, and the table that the table is
+        balanced on. The total mass represnts the combined mass.
+    x, dx, theta, dtheta, d2x, d2theta : double
+        x is the center of the carts position on the path. dx is the x values velocity.
+        theta is the angle of the stick in regards to its starting position.
+        dtheta is the velocity of theta.
+        d2theta and d2x is the acceleration of theta and x.
+    eulerStep : double
+        The length of the euler step used to calculate the next position.
+    motor_force: double
+        Given an action the motor_force will be applied to the direction of the action.
+    stickWidth, stickHeight, tableWidth, tableHeight : double
+        The length and width of the stick, and the length and width of the table.
+    x_stick, y_stick : double
+        position of the stick and table on the canvas to make be able to visualize it.
+    rendering : boolean
+        False if we dont want to visualise the game through a canvas. Otherwise true. 
+    """ 
         def __init__(self):
 
                 #Generall properties:
@@ -35,7 +63,6 @@ class CartPole():
                 self.tableWidth = 50
                 self.tableHeight = 10
                 self.tableMass = 1
-                self.acc_time = 0.2
                 self.x_table = self.x -25
                 self.y_table = self.y -5
                 #Toggles first render
@@ -43,6 +70,7 @@ class CartPole():
 
 
         def render(self):
+                # If we want to visualize the path on a canvas or not.
                 if not self.rendering:
                         self.rendering = True
                         pygame.init()
@@ -53,6 +81,7 @@ class CartPole():
                 pygame.display.update()
 
         def step(self, act):
+                # act = 1 gives a force on the direction to the right. Opposite for act = 0;
                 if act == 1:
                         self.motor_force= 300.0
                 elif act == 0:
@@ -60,7 +89,7 @@ class CartPole():
 
                 costheta = math.cos(self.theta)
                 sintheta = math.sin(self.theta)
-                #ODE-system implementation for solving differential equations in FormulasForSolvingSystem.PNG:
+                #ODE-system implementation for solving differential equations in: FormulasForSolvingSystem.PNG:
                 temp = (self.motor_force + self.stickMass*0.5 * self.dtheta * self.dtheta * sintheta) / self.totalMass
                 self.d2theta = (self.gravity * sintheta - costheta* temp) / (self.stickHeight * (4.0/3.0 - self.stickMass * costheta * costheta / self.totalMass))
                 self.d2x = temp - self.stickMass*0.5*self.d2theta*costheta / self.totalMass
@@ -71,7 +100,7 @@ class CartPole():
                 self.x = self.euler(self.x, self.dx)
                 self.dx = self.euler(self.dx, self.d2x)
 
-                # Getting the angle in the right intervall and startvalue:
+                # Getting the angle in the right intervall and startvalue. This is in the intervall [-pi/2: pi/2]:
                 angle = -self.theta + math.pi
                 if angle > 0:
                         angle = angle - 2*math.pi * math.ceil(angle/(2*math.pi))
@@ -96,12 +125,13 @@ class CartPole():
 
 
 
-        #Eulers fomula with one step:
         def euler(self, value, dvalue):
+                #Eulers fomula with one step, the eulerStep gives how big of a step we want to take. 
                 value = value + self.eulerStep*dvalue
                 return value
 
         def reset(self):
+                #Reset the state for  new test of the system. Used with the q-network when we need to to a new run. 
                 self.x = 400.0
                 self.y = 600.0
                 self.dx = 0.0
