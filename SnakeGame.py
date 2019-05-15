@@ -5,7 +5,54 @@ from collections import deque
 
 
 class SnakeGame:
+	""" A classic snake game of variable size
+
+	The SnakeGame class keeps track of and claculates the next step of the
+	state of a snake game. The state of the game is described by the attributes
+	of the class but only global_state is given to the player. The state is
+	represented in such a convoluted way in order for the DeepLearner agents to
+	learn how to play the game efficenty.
+
+	Attributes
+	----------
+	size : int
+		The size of the grid of the game
+	state_size : int
+		The length of self.global_state, required for the agent to know how to
+		rehape the state vector
+	action_size : int
+		The number of possible actions a player can take. The snake has the option
+		to go left, straight, or right at any state of the game.
+	snake : deque
+		Data structure holding tuples representing the coordinates of parts of the snake.
+		The first element is always the head and the last always the tail
+	snake_size : int
+		Current size of the snake, grows by one with each apple eaten
+	direction : string
+		Current direction the snake is traveling
+	relative_directions : dictionary
+		Maps an action with the current direction and returns a new direction
+	apple : tuple[int]
+		Coordinates of the apple
+	local_state : list[int]
+		The first four elements encode the current direction of the snake (for example: [0,1,0,0] equals left).
+		Elements 4,5,and 6 encode if there is a dangerous space directly to the left,front, and right of the head
+	global_state : list[int]
+		Encodes the state of the game for the agent to receive. Every 4 elements encodes one space in the game (for
+		example [0,0,1,0] represents the snakes head residing in that space). The last 7 elements correspond to the
+		local_state.
+
+	"""
+
 	def __init__(self, size):
+		"""
+		Parameters
+		----------
+
+		size : int
+			The size of the grid of the game
+		"""
+
 		self.size = size
 		self.state_size = (self.size * self.size*4) + 7
 		self.action_size = 3
@@ -19,7 +66,8 @@ class SnakeGame:
 		pygame.init()
 
 	def render(self):
-		# Draw rectangles for snake and apple
+		# Draw rectangles for snake and apple and display on screen
+
 		self.screen.fill((0,0,0))
 		pygame.draw.rect(self.screen, (244, 66, 66), pygame.Rect(self.apple[1]*50, self.apple[0]*50, 50, 50))
 		for snake in self.snake:
@@ -28,6 +76,8 @@ class SnakeGame:
 
 
 	def step(self, act):
+		# Takes the current state of the game and an action parameter and calculates the next state of the game
+
 		end_state = False
 		reward = -0.005
 		previous_head = self.snake[0]
@@ -69,12 +119,14 @@ class SnakeGame:
 				self.place_apple()
 				self.snake_size += 1
 
-
+			# Update self.global_state to match new state
 			self.set_state(new_head, previous_head, tail)
 		next_state = self.global_state
 		return next_state, reward, end_state
 
+
 	def reset(self):
+		# Sets the state of the game to its initial values
 
 		# Create snake
 		snake_start = (math.ceil(self.size/2)-1, math.ceil(self.size/2)-1)
@@ -94,6 +146,7 @@ class SnakeGame:
 
 
 	def set_state(self, head, previous_head, tail):
+		# Encodes the state of the snake and apple in the list self.global_state
 
 		# Get coordinates of changes
 		head_coord = (head[0]*self.size + head[1])* 4
@@ -139,7 +192,6 @@ class SnakeGame:
 			front_sensor = (head[0]+1, head[1])
 			right_sensor = (head[0], head[1]-1)
 
-
 		# Change local state of sensors
 		self.local_state[4:] = [0,0,0]
 		# left sensor
@@ -172,6 +224,8 @@ class SnakeGame:
 
 
 	def place_apple(self):
+		# Chooses a random, empty coordinate for the apple
+
 		apple_coords = (random.randrange(self.size), random.randrange(self.size))
 		collision = True
 
@@ -185,10 +239,14 @@ class SnakeGame:
 
 
 	def convert_coord(self, xy_tuple):
+		# Converts coordinates in the form (x,y) to there corresponding index in self.global_state
+
 		return (xy_tuple[0]*self.size + xy_tuple[1]) * 4
 
 
 	def out_of_bounds(self, xy_tuple):
+		# Returns True if given coordinates are out of bounds, false otherwise
+
 		if xy_tuple[0] < 0 or xy_tuple[0] >= self.size or xy_tuple[1] < 0 or xy_tuple[1] >= self.size:
 			return True
 		else:
@@ -196,6 +254,8 @@ class SnakeGame:
 
 
 	def print_state(self):
+		# Prints an ascii representation of the state of the game. Usefull for debugging
+
 		for j in range(self.size):
 			row = []
 			for i in range(self.size):
