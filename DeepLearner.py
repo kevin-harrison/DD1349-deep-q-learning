@@ -110,13 +110,6 @@ class DeepLearner(object):
         act_values = self.q_network.predict(state)
         return np.argmax(act_values[0])
 
-    def play(self, state):
-        # Consults the q_network to return the action with the best predicted
-        # reward
-
-        act_values = self.q_network.predict(state)
-        return np.argmax(act_values[0])
-
 
     def replay(self, batch_size):
         # Selects a number of transistions from memory replay, creates TD-targets
