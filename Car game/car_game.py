@@ -9,7 +9,35 @@ screen = pygame.display.set_mode((1478, 731))
 pygame.init()
 
 class Car:
+    """Car-game is the third game we wanna try for our q-learning algorithm.
+        The game consist of a rectangular road, a patch of grass in the middle
+        and a car. The goal of the course is to return to the starting position without
+        breaking the limits (the canvas and the patch of grass).
+	Attributes
+	----------
+ 	position : Vector2
+		The position in the x, y plane of the car.
+	velocity: Vector2
+		The velocity in the x and y direction of the car.
+	angle : double
+		The angle from in respect to the initial position of the car.
+	max_acceleration: double
+	         The maximum acceleration of the car.
+        max_acceleration, max_steering, max_velocity, : double
+	         The maximum acceleration, steering (how fast the car turns) and
+	         the velocity of the car.
+	acceleration, steering: double
+	         The current acceleration and steering/turning of the car.
+	"""
     def __init__(self, x, y):
+          """
+        Parameters
+        ----------
+        x : double
+            The x-coordinate position of the car.
+        y : double
+            The y-coordinate position of the car.
+        """
         self.position = Vector2(x,y)
         self.velocity = Vector2(0.0,0.0)
         self.angle = 0.0
@@ -23,6 +51,7 @@ class Car:
         self.brake_deceleration = 10
         
     def step(self, h):
+        # state update after an action.
         self.velocity += (self.acceleration*h, 0)
         self.velocity.x = max(-self.max_velocity, min(self.velocity.x, self.max_velocity))
         
@@ -36,8 +65,10 @@ class Car:
         self.angle += degrees(angular_velocity) * h
         
 class Game():
+    def 
 
     def boundaries_check(self,vector):
+        # The boundaries of the grass patch and the canvas.
         broken_limit = False
         reward = 1
         if ((1249 > vector[0] and vector[0] > 230) and (200 < vector[1] and vector[1] < 542)):
@@ -46,6 +77,7 @@ class Game():
         return broken_limit
     
     def render(self,car_image, path_image, car, ppu, clock):
+        # Called if we want to plot the game canvas.
         screen.blit(path_image, (0,0))
         rotated = pygame.transform.rotate(car_image, car.angle)
         rect = rotated.get_rect()
@@ -67,7 +99,6 @@ class Game():
 
         while not done:
             h = clock.get_time() / 1000
-            # Game exit:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
