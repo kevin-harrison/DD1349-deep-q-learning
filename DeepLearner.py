@@ -82,6 +82,18 @@ class DeepLearner(object):
 
         self.target_network.set_weights(self.q_network.get_weights())
 
+    def load(self, filename):
+        # Loads q and target network from file
+
+        self.q_network.load_weights(filename)
+        self.update_target_network()
+
+    def save(self, filename):
+        # Saves q and target network to file
+
+        self.q_network.save_weights(filename)
+        self.update_target_network()
+
 
     def remember(self, state, action, reward, next_state, is_done):
         # Adds a state transition to the agent's memory replay
@@ -95,6 +107,13 @@ class DeepLearner(object):
 
         if np.random.rand() <= self.exploration_rate:
             return random.randrange(self.action_size)
+        act_values = self.q_network.predict(state)
+        return np.argmax(act_values[0])
+
+    def play(self, state):
+        # Consults the q_network to return the action with the best predicted
+        # reward
+
         act_values = self.q_network.predict(state)
         return np.argmax(act_values[0])
 
