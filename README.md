@@ -12,6 +12,7 @@ If you imagine a table where each row represents a certain state of a game and e
 
 ![picture](images/q_networks.png)
 
+In out implementation of Q learning we use one network to choose actions and train on the results and another network, called a target network, to predict the potential future rewards of those actions, a process called temporal difference learning. In addition, instead of training the network on what happens in the game chronologically, the agent has a memory of a fixed size and trains on its memories of the games in a random order.
 
 ## Game of cartpol:
 
@@ -40,6 +41,7 @@ This is a lot to take in... As an summary of the easiest parts, we have the forc
 Wich are two second degree differential equations solving the angle theta with respect to the center of the tables **x** coordinate, and the end of the stick. This system can be solved by rewritting it to an ODE-system and then Eulers formula:
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=y(n&plus;1)&space;=&space;y(n)&space;&plus;&space;h&space;\cdot&space;F(y(n),&space;t)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?y(n&plus;1)&space;=&space;y(n)&space;&plus;&space;h&space;\cdot&space;F(y(n),&space;t)" title="y(n+1) = y(n) + h \cdot F(y(n), t)" /></a>
+
 
 # Useful Resources
 
