@@ -1,9 +1,21 @@
 # DD1349-projinda
 
+This project focuses on creating a model free learning algorithm that can play simple video games. The algorithm that learns to play the games is called Deep Q Learning. In this project we demonstrate the algorithm's ability to learn to play three games: Cart pole, Snake, and a Car game.
+
+## Deep Q Learning
+
+Q learning can be used when you have a discretized action and state space. In our scenario an agent is given a game state and it must decide which action to take with the goal of maximizing its reward.
+
+![picture](images/agent_environment.png)
+
+If you imagine a table where each row represents a certain state of a game and each element of that row represents the reward of choosing each action at that state, this is called a Q table. With perfect knowledge of how the game works you could create a perfect Q table and even use a stochastic process to update a Q table, effectively "learning" to play a game. The problem is that even relatively simple games can have very large state spaces and thus very large Q tables. Chess is estimated to have around 10^128 game states, even larger than the estimated number of atoms in the observable universe, 10^80. To solve this deep Q learning replaces a Q table with a neural network that, through playing a game, learn to estimate a perfect Q table.
+
+![picture](images/q_networks.png)
+
 
 ## Game of cartpol:
 
-You are being welcomed to the game of *cartpol*. Can you beat an neural network in this game? Lets find out!
+You are being welcomed to the game of *cartpol*. Can you beat a neural network in this game? Lets find out!
 
 The rules are simple, navigate the table on the screen using left and right arrow. There is a stick that is attached thorugh a 90 degrees angle with respect to the table. Applying a force on the table (equivalent with moving the table) causes the stick to move. You loose if either of the following occurrences take place:
 
