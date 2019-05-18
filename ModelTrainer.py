@@ -33,7 +33,7 @@ class ModelTrainer(object):
 	def __init__(self):
 
 		# Game attributes
-		self.game = Car(3,3) # TODO: add more games
+		self.game = Car(0,0) # TODO: add more games
 		self.state_size = self.game.state_size
 		self.action_size = self.game.action_size
 
@@ -55,7 +55,7 @@ class ModelTrainer(object):
 			total_reward = 0
 
 			for time in range(1000):
-				self.game.render() # Comment out to train faster
+				# self.game.render() # Comment out to train faster
 
 				# Get information about state change and remember it
 				action = agent.act(state)
@@ -100,5 +100,5 @@ class ModelTrainer(object):
 
 
 trainer = ModelTrainer()
-trainer.get_training_data(100, 32)
+trainer.get_training_data(1000, 32)
 trainer.plot_data()
