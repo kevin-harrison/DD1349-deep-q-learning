@@ -96,13 +96,13 @@ class Car:
     
         if self.position[1] < 11.62 and self.position[0] > 23.25 and (len(self.rewarder)==3):
             reward = self.rewarder[0]
-            del self.rewarder[0]
+            self.rewarder.pop(0)
         elif self.position[1] < 11.625 and self.position[0] > 23.25 and (len(self.rewarder)==2):
             reward = self.rewarder[0]
-            del self.rewarder[0]
+            self.rewarder.pop(0)
         elif self.position[1] > 11.625 and self.position[0] < 23.25 and (len(self.rewarder)==1):
             reward = self.rewarder[0]
-            del self.rewarder[0]
+            self.rewarder.pop(0)
         else:
             reward = 1
         return reward
@@ -122,9 +122,9 @@ class Car:
         end_state = False
         reward = 1
         if action == 0:
-            self.acceleration += 10000 * h
+            self.acceleration += 100 * h
         elif action == 1:
-            if self.velocity.x > 10000 * self.brake_deceleration:
+            if self.velocity.x > 100 * self.brake_deceleration:
                 self.acceleration = -copysign(self.brake_deceleration, self.velocity.x)
             else:
                 self.acceleration = -self.velocity.x / h
@@ -136,9 +136,9 @@ class Car:
                     self.acceleration = -self.velocity.x / h
                     self.acceleration = max(-self.max_acceleration, min(self.acceleration, self.max_acceleration))
         if action == 2:
-            self.steering -= 3000 * h
+            self.steering -= 30 * h
         elif action == 3:
-            self.steering += 3000 * h
+            self.steering += 30 * h
         else:
             self.steering = 0
         self.steering = max(-self.max_steering, min(self.steering, self.max_steering))
