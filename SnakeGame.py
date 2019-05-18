@@ -97,6 +97,7 @@ class SnakeGame:
 		# Check boundaries
 		if new_head[0] < 0 or new_head[0] >= self.size or new_head[1] < 0 or new_head[1] >= self.size:
 			end_state = True
+			reward = -0.5
 			#print("Out of bounds")
 
 		# Check if moved into itself

@@ -6,6 +6,7 @@ from AI_learning import CartPole
 from SnakeGame import SnakeGame
 from car_game import Car
 
+
 class ModelTrainer(object):
 	"""Facilitates training of DeepLearner agents
 
@@ -45,7 +46,7 @@ class ModelTrainer(object):
 		# Trains the agents on the game num_episodes times. Also
 		# renders the game at each state
 
-		agent = self.model # TODO: Allow for training of multiple models at once
+		agent = self.model
 
 		for episode in range(num_episodes):
 			state = self.game.reset() # Sets game to starting state
