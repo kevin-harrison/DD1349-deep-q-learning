@@ -20,10 +20,11 @@ class RewardGate:
         self.y_length = y_length
 
     def collide(self, x_coord, y_coord):
+        collide = False
         if x_coord > self.x and x_coord < self.x + self.x_length:
             if y_coord > self.y and y_coord < self.y + self.y_length:
-                return True
-        return False
+                collide = True
+        return collide
 
 
 class Car:
@@ -68,11 +69,8 @@ class Car:
         self.steering = 0.0
         self.brake_deceleration = 10
         self.clock = pygame.time.Clock()
-<<<<<<< HEAD
-        self.rewarder = [100,300,1000]
-=======
-        self.rewards = [RewardGate(100,3,10,200)]
->>>>>>> 9a95fa41cf58158e470c500dcd3822078fe7bd84
+        self.rewards = [RewardGate(2,0,7,7), RewardGate(33,0,7,7), RewardGate(33,10,6,6), RewardGate(20,16,6,6)]
+        self.ratiopixels = 0.026
         #Interaction with the q-learning  algorithm.
         self.state_size = 4
         self.action_size = 4
@@ -98,7 +96,7 @@ class Car:
     def boundaries_check(self):
         # Controll if the car hos broken the limits of the game.
         broken_limit = False
-        if ((16.25 > self.position[1] and self.position[1] > 7) and (-3 < self.position[0] and self.position[0] < 39.3)):
+        if ((16.25 > self.position[1] and self.position[1] > 7) and (-3 < self.position[0] and self.position[0] < 33.3)):
             broken_limit = True
 
         elif ((-0.34 > self.position[1] or self.position[1] > 26.53) or (-0.2 > self.position[0] or self.position[0] > 39.3)):
@@ -107,30 +105,15 @@ class Car:
         return broken_limit
 
     def additional_reward_calculation(self):
-<<<<<<< HEAD
-        reward =0;
-
-        if self.position[1] < 11.62 and self.position[0] > 23.25 and (len(self.rewarder)==3):
-            reward = self.rewarder[0]
-            self.rewarder.pop(0)
-        elif self.position[1] < 11.625 and self.position[0] > 23.25 and (len(self.rewarder)==2):
-            reward = self.rewarder[0]
-            self.rewarder.pop(0)
-        elif self.position[1] > 11.625 and self.position[0] < 23.25 and (len(self.rewarder)==1):
-            reward = self.rewarder[0]
-            self.rewarder.pop(0)
-        else:
-            reward = 0
-=======
-        reward = -1
+        reward = 0
 
         for i in range(len(self.rewards)):
 
             if self.rewards[i].collide(self.position[0], self.position[1]):
                 reward = 100
                 self.rewards.pop(i)
+                print("milestone reached!")
 
->>>>>>> 9a95fa41cf58158e470c500dcd3822078fe7bd84
         return reward
 
     def render(self):
@@ -139,12 +122,9 @@ class Car:
         rotated = pygame.transform.rotate(car_image, self.angle)
         rect = rotated.get_rect()
         screen.blit(rotated, self.position * ppu - (rect.width / 2, rect.height / 2))
-
-        print("Car converted coords:", self.position * ppu - (rect.width / 2, rect.height / 2))
-        print("Gate:", self.rewards[0].x, self.rewards[0].y)
         for gate in self.rewards:
-            pygame.draw.rect(screen, (244, 66, 66), pygame.Rect(gate.x, gate.y, gate.x_length, gate.y_length))
-        pygame.display.update()
+            pygame.draw.rect(screen, (244, 66, 66), pygame.Rect(gate.x/self.ratiopixels, gate.y/self.ratiopixels, gate.x_length/self.ratiopixels, gate.y_length/self.ratiopixels))
+        pygame.display.update() 
 
     def step(self, action):
     # actions: 0 = break, 1 = forward, 2 = left, 3 = right.
@@ -193,7 +173,6 @@ class Car:
         self.position[1] = 0;
         self.velocity[0] = 0;
         self.velocity[1] = 0;
-        self.rewards = [RewardGate(100,3,10,200)]
         state = [self.position[0], self.position[1], self.velocity[0], self.velocity[1]]
         return state
 
