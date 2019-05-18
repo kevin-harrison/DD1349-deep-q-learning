@@ -4,6 +4,7 @@ import numpy as np
 from DeepLearner import DeepLearner
 from AI_learning import CartPole
 from SnakeGame import SnakeGame
+from car_game import Car
 
 class ModelTrainer(object):
 	"""Facilitates training of DeepLearner agents
@@ -31,7 +32,7 @@ class ModelTrainer(object):
 	def __init__(self):
 
 		# Game attributes
-		self.game = SnakeGame(8) # TODO: add more games
+		self.game = Car(0,0) # TODO: add more games
 		self.state_size = self.game.state_size
 		self.action_size = self.game.action_size
 
@@ -53,7 +54,7 @@ class ModelTrainer(object):
 			total_reward = 0
 
 			for time in range(1000):
-				self.game.render() # Comment out to train faster
+				#self.game.render() # Comment out to train faster
 
 				# Get information about state change and remember it
 				action = agent.act(state)
@@ -94,5 +95,5 @@ class ModelTrainer(object):
 
 
 trainer = ModelTrainer()
-trainer.get_training_data(300, 32)
+trainer.get_training_data(100, 32)
 trainer.plot_data()

@@ -4,9 +4,16 @@ import random
 import os
 import numpy as np
 from pygame.math import Vector2
+current_dir = os.path.dirname(os.path.abspath(__file__))
+image_path = os.path.join(current_dir, "race_car.png")
+image_track_path = os.path.join(current_dir, "car-track.png")
+car_image = pygame.image.load(image_path)
+path_image = pygame.image.load(image_track_path)
 WHITE = (255,255,255)
 screen = pygame.display.set_mode((1478, 731))
-pygame.init()
+
+
+
 
 class Car:
     """Car-game is the third game we wanna try for our q-learning algorithm.
@@ -43,14 +50,16 @@ class Car:
         self.angle = 0.0
         self.length = 4
         self.max_acceleration = 5.0
-        self.max_steering = 80
-        self.max_velocity = 20
+        self.max_steering = 40
+        self.max_velocity = 30
         self.free_deceleration = 2
         self.acceleration = 0.0
         self.steering = 0.0
         self.brake_deceleration = 10
         self.clock = pygame.time.Clock()
-        self.state_size = 10
+        #Interaction with the q-learning  algorithm. 
+        self.state_size = 4
+        self.action_size = 4
         
     def action(self, h):
         # state update after an action.
@@ -66,71 +75,76 @@ class Car:
         self.position += self.velocity.rotate(-self.angle) * h
         self.angle += degrees(angular_velocity) * h
         
-        # Returning the cars position on the map.
-        return position
+        # Returning the cars position and velocity as state.
+        state = [self.position[0], self.position[1], self.velocity[0], self.velocity[1]]
+        return state
 
     def boundaries_check(self):
         # Controll if the car hos broken the limits of the game.
         broken_limit = False
-        if ((16.25 > self.position[1] and self.position[1] > 7) and (0 < self.position[0] and self.position[0] < 39.3)):
+        if ((16.25 > self.position[1] and self.position[1] > 7) and (-3 < self.position[0] and self.position[0] < 39.3)):
             broken_limit = True
-         
-        elif ((-0.34 > self.position[1] or self.position[1] > 26.53) or (-0.2 < self.position[0] or self.position[0] < 39.3)):
+               
+        elif ((-0.34 > self.position[1] or self.position[1] > 26.53) or (-0.2 > self.position[0] or self.position[0] > 39.3)):
             broken_limit = True
 
         return broken_limit
     
-    def additional_reward_calculation(self, vector):
+    def additional_reward_calculation(self):
         reward = None;
         if self.position[1] < 11.625 and self.position[0] > 23.25:
-            reward = 2
+            reward = 10
         elif self.position[1] < 11.625 and self.position[0] > 23.25:
-            reward = 4
-        elif self.position[1] < 11.625 and self.position[0] < 23.25:
-            reward = 6
+            reward = 50
+        elif self.position[1] > 11.625 and self.position[0] < 23.25:
+            reward = 100
         else:
             reward = 1
         return reward
     
+    def render(self):
+        ppu = 32
+        screen.blit(path_image, (0,0))
+        rotated = pygame.transform.rotate(car_image, self.angle)
+        rect = rotated.get_rect()
+        screen.blit(rotated, self.position * ppu - (rect.width / 2, rect.height / 2))
+        
     def step(self, action):
     # actions: 0 = break, 1 = forward, 2 = left, 3 = right.
     # Provides the action for the car at given moment.
-        h = clock.get_time() / 1000
+        h =0.017
         end_state = False
-        reward = 0;
-        if action == 1:
-            car.acceleration += 10 * h
-        elif action == 0:
-            if car.velocity.x > 5000 * car.brake_deceleration:
-                car.acceleration = -copysign(car.brake_deceleration, car.velocity.x)
+        reward = 0
+        if action == 0:
+            self.acceleration += 10000 * h
+        elif action == 1:
+            if self.velocity.x > 10000 * self.brake_deceleration:
+                self.acceleration = -copysign(self.brake_deceleration, self.velocity.x)
             else:
-                car.acceleration = -car.velocity.x / h
+                self.acceleration = -self.velocity.x / h
         else:
-            if abs(car.velocity.x) > h * car.free_deceleration:
-                car.acceleration = -copysign(car.free_deceleration, car.velocity.x)
+            if abs(self.velocity.x) > h * self.free_deceleration:
+                self.acceleration = -copysign(self.free_deceleration, self.velocity.x)
             else:
                 if h != 0:
-                    car.acceleration = -car.velocity.x / h
-                    car.acceleration = max(-car.max_acceleration, min(car.acceleration, car.max_acceleration))
+                    self.acceleration = -self.velocity.x / h
+                    self.acceleration = max(-self.max_acceleration, min(self.acceleration, self.max_acceleration))
         if action == 2:
-            car.steering -= 80 * h
+            self.steering -= 3000 * h
         elif action == 3:
-            car.steering += 80 * h
+            self.steering += 3000 * h
         else:
-            car.steering = 0
-        car.steering = max(-car.max_steering, min(car.steering, car.max_steering))
+            self.steering = 0
+        self.steering = max(-self.max_steering, min(self.steering, self.max_steering))
         # Physical consequence of the given action.
         next_state = self.action(h)
         # Checks to see if crash has taken place, otherwise reward dependent on how long it has come on the path. 
-        has_crashed = boundaries_check(position)
+        has_crashed = self.boundaries_check()
         if has_crashed:
             end_state = True
             reward = -10
-            # Getting were it crashed.
-            print(position[0])
-            print(position[1])
         else:
-            if action != 0:
+            if action == 0:
                 reward = self.additional_reward_calculation()
         
         return next_state, reward, end_state
@@ -139,7 +153,9 @@ class Car:
         self.position[0] = 0;
         self.position[1] = 0;
         self.velocity[0] = 0;
-        self.position[1] = 0;
+        self.velocity[1] = 0;
+        state = [self.position[0], self.position[1], self.velocity[0], self.velocity[1]]
+        return state
         
 '''  
 class Game():
