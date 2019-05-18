@@ -33,7 +33,7 @@ class ModelTrainer(object):
 	def __init__(self):
 
 		# Game attributes
-		self.game = Car(0,0) # TODO: add more games
+		self.game = Car(3,3) # TODO: add more games
 		self.state_size = self.game.state_size
 		self.action_size = self.game.action_size
 
@@ -80,7 +80,11 @@ class ModelTrainer(object):
 					agent.replay(batch_size)
 
 			if not done:
-				print("WON THE GAME!")
+				self.training_rewards.append(total_reward)
+				self.training_times.append(time)
+				agent.update_target_network()
+				print("episode: {}/{}, time: {}, reward: {}, e: {:.2}"
+						  .format(episode, num_episodes, time, total_reward, agent.exploration_rate))
 
 
 	def plot_data(self):

@@ -57,6 +57,7 @@ class Car:
         self.steering = 0.0
         self.brake_deceleration = 10
         self.clock = pygame.time.Clock()
+        self.rewarder = [50,200,1000]
         #Interaction with the q-learning  algorithm. 
         self.state_size = 4
         self.action_size = 4
@@ -91,13 +92,17 @@ class Car:
         return broken_limit
     
     def additional_reward_calculation(self):
-        reward = None;
-        if self.position[1] < 11.625 and self.position[0] > 23.25:
-            reward = 10
-        elif self.position[1] < 11.625 and self.position[0] > 23.25:
-            reward = 50
-        elif self.position[1] > 11.625 and self.position[0] < 23.25:
-            reward = 100
+        reward = 1;
+    
+        if self.position[1] < 11.62 and self.position[0] > 23.25 and (len(self.rewarder)==3):
+            reward = self.rewarder[0]
+            del self.rewarder[0]
+        elif self.position[1] < 11.625 and self.position[0] > 23.25 and (len(self.rewarder)==2):
+            reward = self.rewarder[0]
+            del self.rewarder[0]
+        elif self.position[1] > 11.625 and self.position[0] < 23.25 and (len(self.rewarder)==1):
+            reward = self.rewarder[0]
+            del self.rewarder[0]
         else:
             reward = 1
         return reward
@@ -108,13 +113,14 @@ class Car:
         rotated = pygame.transform.rotate(car_image, self.angle)
         rect = rotated.get_rect()
         screen.blit(rotated, self.position * ppu - (rect.width / 2, rect.height / 2))
+        pygame.display.update()
         
     def step(self, action):
     # actions: 0 = break, 1 = forward, 2 = left, 3 = right.
     # Provides the action for the car at given moment.
         h =0.017
         end_state = False
-        reward = 0
+        reward = 1
         if action == 0:
             self.acceleration += 10000 * h
         elif action == 1:
@@ -142,6 +148,8 @@ class Car:
         has_crashed = self.boundaries_check()
         if has_crashed:
             end_state = True
+            print(self.position[0])
+            print(self.position[1])
             reward = -10
         else:
             if action == 0:
