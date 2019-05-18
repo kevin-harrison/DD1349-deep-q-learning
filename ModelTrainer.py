@@ -55,7 +55,7 @@ class ModelTrainer(object):
 			total_reward = 0
 
 			for time in range(1000):
-				#self.game.render() # Comment out to train faster
+				self.game.render() # Comment out to train faster
 
 				# Get information about state change and remember it
 				action = agent.act(state)

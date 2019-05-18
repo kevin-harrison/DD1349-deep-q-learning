@@ -5,7 +5,7 @@ import os
 import numpy as np
 from pygame.math import Vector2
 current_dir = os.path.dirname(os.path.abspath(__file__))
-image_path = os.path.join(current_dir, "race_car.png")
+image_path = os.path.join(current_dir, "race_car.PNG")
 image_track_path = os.path.join(current_dir, "car-track.png")
 car_image = pygame.image.load(image_path)
 path_image = pygame.image.load(image_track_path)
@@ -58,15 +58,15 @@ class Car:
         self.brake_deceleration = 10
         self.clock = pygame.time.Clock()
         self.rewarder = [50,200,1000]
-        #Interaction with the q-learning  algorithm. 
+        #Interaction with the q-learning  algorithm.
         self.state_size = 4
         self.action_size = 4
-        
+
     def action(self, h):
         # state update after an action.
         self.velocity += (self.acceleration*h, 0)
         self.velocity.x = max(-self.max_velocity, min(self.velocity.x, self.max_velocity))
-        
+
         if self.steering:
             radius = self.length/tan(radians(self.steering))
             angular_velocity = self.velocity[0] / radius
@@ -75,7 +75,7 @@ class Car:
 
         self.position += self.velocity.rotate(-self.angle) * h
         self.angle += degrees(angular_velocity) * h
-        
+
         # Returning the cars position and velocity as state.
         state = [self.position[0], self.position[1], self.velocity[0], self.velocity[1]]
         return state
@@ -85,28 +85,28 @@ class Car:
         broken_limit = False
         if ((16.25 > self.position[1] and self.position[1] > 7) and (-3 < self.position[0] and self.position[0] < 39.3)):
             broken_limit = True
-               
+
         elif ((-0.34 > self.position[1] or self.position[1] > 26.53) or (-0.2 > self.position[0] or self.position[0] > 39.3)):
             broken_limit = True
 
         return broken_limit
-    
+
     def additional_reward_calculation(self):
         reward = 1;
-    
+
         if self.position[1] < 11.62 and self.position[0] > 23.25 and (len(self.rewarder)==3):
             reward = self.rewarder[0]
-            del self.rewarder[0]
+            self.rewarder.pop(0)
         elif self.position[1] < 11.625 and self.position[0] > 23.25 and (len(self.rewarder)==2):
             reward = self.rewarder[0]
-            del self.rewarder[0]
+            self.rewarder.pop(0)
         elif self.position[1] > 11.625 and self.position[0] < 23.25 and (len(self.rewarder)==1):
             reward = self.rewarder[0]
-            del self.rewarder[0]
+            self.rewarder.pop(0)
         else:
-            reward = 1
+            reward = -1
         return reward
-    
+
     def render(self):
         ppu = 32
         screen.blit(path_image, (0,0))
@@ -114,7 +114,7 @@ class Car:
         rect = rotated.get_rect()
         screen.blit(rotated, self.position * ppu - (rect.width / 2, rect.height / 2))
         pygame.display.update()
-        
+
     def step(self, action):
     # actions: 0 = break, 1 = forward, 2 = left, 3 = right.
     # Provides the action for the car at given moment.
@@ -144,7 +144,7 @@ class Car:
         self.steering = max(-self.max_steering, min(self.steering, self.max_steering))
         # Physical consequence of the given action.
         next_state = self.action(h)
-        # Checks to see if crash has taken place, otherwise reward dependent on how long it has come on the path. 
+        # Checks to see if crash has taken place, otherwise reward dependent on how long it has come on the path.
         has_crashed = self.boundaries_check()
         if has_crashed:
             end_state = True
@@ -154,9 +154,9 @@ class Car:
         else:
             if action == 0:
                 reward = self.additional_reward_calculation()
-        
+
         return next_state, reward, end_state
-    
+
     def reset(self):
         self.position[0] = 0;
         self.position[1] = 0;
@@ -164,16 +164,16 @@ class Car:
         self.velocity[1] = 0;
         state = [self.position[0], self.position[1], self.velocity[0], self.velocity[1]]
         return state
-        
-'''  
+
+'''
 class Game():
-    
+
     def boundaries_check(self,vector):)
         if ((16.25 > vector[1] and vector[1] > 7) and (7 < vector[0] and vector[0] < 39.3)):
             broken_limit = True
             reward = -100;
         return broken_limit
-    
+
     def render(self,car_image, path_image, car, ppu, clock):
         # Called if we want to plot the game canvas.
         screen.blit(path_image, (0,0))
@@ -226,9 +226,9 @@ class Game():
             # Reseting screen:
             rect = self.render(car_image, path_image, car, ppu, clock)
             done = self.boundaries_check(car.position)
-            
+
         pygame.quit()
-        
+
 if __name__ == "__main__":
     game = Game()
     game.run()
