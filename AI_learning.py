@@ -8,6 +8,7 @@ WHITE = (255,255,255)
 BROWN = (151, 84, 69)
 BLACK = (0,0,0)
 screen = pygame.display.set_mode((800, 800))
+pygame.init()
 
 class CartPole():
 	"""Cartpol agent
@@ -41,7 +42,7 @@ class CartPole():
 	"""
 	def __init__(self):
 
-		#Generall properties:
+		# Generall properties:
 		self.totalMass = 1.1
 		self.gravity = 9.8
 		self.x = 400.0
@@ -53,28 +54,26 @@ class CartPole():
 		self.d2theta = 0.0
 		self.eulerStep = 0.02
 		self.motor_force = 0
-		#Stick properties:
+		self.state_size = 4
+		self.action_size = 2
+		# Stick properties:
 		self.stickWidth = 3
 		self.stickHeight = 70
 		self.stickMass = 0.1
 		self.x_stick = self.x -1.5
 		self.y_stick = self.y - 70
-		#Table properties:
+		# Table properties:
 		self.tableWidth = 50
 		self.tableHeight = 10
 		self.tableMass = 1
 		self.x_table = self.x -25
 		self.y_table = self.y -5
-		#Toggles first render
-		self.rendering = False
+
 
 	def render(self):
-		# If we want to visualize the path on a canvas or not.
-		if not self.rendering:
-			self.rendering = True
-			pygame.init()
+		# Renders the state of the game
 
-			screen.fill(WHITE)
+		screen.fill(WHITE)
 		pygame.draw.line(screen, BROWN, (self.x, self.y), (self.x_stick, self.y_stick), 3)
 		pygame.draw.rect(screen, BLACK, pygame.Rect(self.x_table, self.y_table, self.tableWidth, self.tableHeight))
 		pygame.display.update()
