@@ -100,5 +100,5 @@ class ModelTrainer(object):
 
 
 trainer = ModelTrainer()
-trainer.get_training_data(100, 32)
+trainer.get_training_data(300, 32)
 trainer.plot_data()
