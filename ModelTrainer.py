@@ -54,13 +54,12 @@ class ModelTrainer(object):
 			done = False
 			total_reward = 0
 
-			for time in range(1000):
-				self.game.render() # Comment out to train faster
+			for time in range(600):
+				#self.game.render() # Comment out to train faster
 
 				# Get information about state change and remember it
 				action = agent.act(state)
 				next_state, reward, done = self.game.step(action)
-				reward = reward if not done else -10
 				total_reward += reward
 				next_state = np.reshape(next_state, [1, self.state_size])
 				agent.remember(state, action, reward, next_state, done)
@@ -100,5 +99,5 @@ class ModelTrainer(object):
 
 
 trainer = ModelTrainer()
-trainer.get_training_data(1000, 32)
+trainer.get_training_data(10000, 32)
 trainer.plot_data()

@@ -47,7 +47,35 @@ Wich are two second degree differential equations solving the angle theta with r
 
 
 ## Car Game
+The rules of the car game is easy, a car is being controlled with 4 different action:
 
+- **Accelerate**: Provides a forward force.
+- **Right turn**: Turnes the car to the right.
+- **Left turn**: Turn car to the left.
+- **Brake**: Gives a velocity opposite direction of velocity.
+
+The more in-depth physics has inspiration from [the following implementation](http://rmgi.blog/pygame-2d-car-tutorial.html) and is also explained in-code.
+
+The track of the car has a rectangular shape with a patch of grass in its center. The goal of the car-game is to drive around the course without breaking the canvas or grass limits.
+
+![picture](images/PathAndCar.PNG)
+
+# The reward system:
+
+Three reward systems has been implemented and tested seperatly to find the optimal implementation. They look as follows.
+
+**1. Staying alive:**
+Rewarding the system only if it stays alive. This involves a starting reward of turning or moving forward. Breaking gives no reward. Breaking the limits gives a high negative reward.
+
+**2. Progressing on path:**
+Rewarding the system if it accesses new parts of the track. This is done by dividing the track into 4 parts. All in wich has different initiall rewards (0,30,100,1000). Breaking the limits again gives a high negative reward and the different rewards is set to 0 if the car breaks.
+![picture](images/Reward-System-2-Car-Game.PNG)
+**The result:**
+![picture](images/Reward-System-2-result-Car-Game.PNG)
+
+**3. Reward gates:**
+The last reward system constist of high reward spots on the map. They Give high rewards the first time the car is positioned inside its limits. The car, as usual, also gets a small reward for going forward. Also, a high negative reward for breaking boundaries. The red boxes represents *Reward Gates*:
+![picture](images/Reward-System-3-Car-Game.PNG)
 
 # Useful Resources
 
