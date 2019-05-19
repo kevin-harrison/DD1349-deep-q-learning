@@ -56,7 +56,8 @@ class ModelTrainer(object):
 			done = False
 			total_reward = 0
 
-			for time in range(500):
+
+			for time in range(600):
 				self.game.render() # Comment out to train faster
 
 				# Get information about state change and remember it
