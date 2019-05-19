@@ -82,11 +82,14 @@ class DeepLearner(object):
 
         self.target_network.set_weights(self.q_network.get_weights())
 
+
     def load(self, filename):
         # Loads q and target network from file
 
         self.q_network.load_weights(filename)
         self.update_target_network()
+        self.exploration_rate = self.exploration_min
+
 
     def save(self, filename):
         # Saves q and target network to file
