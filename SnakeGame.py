@@ -117,8 +117,11 @@ class SnakeGame:
 			# Check if eaten apple
 			if new_head == self.apple:
 				reward = 1
-				self.place_apple()
 				self.snake_size += 1
+				if self.snake_size != self.size * self.size:
+					self.place_apple()
+				else:
+					print("WON THE GAME!")
 
 			# Update self.global_state to match new state
 			self.set_state(new_head, previous_head, tail)
