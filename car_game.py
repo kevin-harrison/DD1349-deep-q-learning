@@ -69,7 +69,7 @@ class Car:
         self.steering = 0.0
         self.brake_deceleration = 10
         self.clock = pygame.time.Clock()
-        self.rewards = [RewardGate(2,0,7,7), RewardGate(33,0,7,7), RewardGate(33,10,6,6), RewardGate(20,16,6,6)]
+        self.rewards = [RewardGate(7,0,7,7),RewardGate(1,0,4,7), RewardGate(33,0,7,7), RewardGate(33,10,6,6), RewardGate(20,16,6,6)]
         self.ratiopixels = 0.026
         #Interaction with the q-learning  algorithm.
         self.state_size = 4
@@ -99,20 +99,21 @@ class Car:
         if ((16.25 > self.position[1] and self.position[1] > 7) and (-3 < self.position[0] and self.position[0] < 33.3)):
             broken_limit = True
 
-        elif ((-0.34 > self.position[1] or self.position[1] > 26.53) or (-0.2 > self.position[0] or self.position[0] > 39.3)):
+        elif ((-0.34 > self.position[1] or self.position[1] > 22.53) or (-0.2 > self.position[0] or self.position[0] > 39.3)):
             broken_limit = True
 
         return broken_limit
 
     def additional_reward_calculation(self):
-        reward = 0
+        reward = 5
 
         for i in range(len(self.rewards)):
 
             if self.rewards[i].collide(self.position[0], self.position[1]):
-                reward = 100
+                reward = 1000
                 self.rewards.pop(i)
                 print("milestone reached!")
+                break
 
         return reward
 
@@ -122,8 +123,8 @@ class Car:
         rotated = pygame.transform.rotate(car_image, self.angle)
         rect = rotated.get_rect()
         screen.blit(rotated, self.position * ppu - (rect.width / 2, rect.height / 2))
-        for gate in self.rewards:
-            pygame.draw.rect(screen, (244, 66, 66), pygame.Rect(gate.x/self.ratiopixels, gate.y/self.ratiopixels, gate.x_length/self.ratiopixels, gate.y_length/self.ratiopixels))
+       # for gate in self.rewards:
+        #    pygame.draw.rect(screen, (244, 66, 66), pygame.Rect(gate.x/self.ratiopixels, gate.y/self.ratiopixels, gate.x_length/self.ratiopixels, gate.y_length/self.ratiopixels))
         pygame.display.update() 
 
     def step(self, action):
@@ -131,7 +132,7 @@ class Car:
     # Provides the action for the car at given moment.
         h =0.017
         end_state = False
-        reward = 0
+        reward = -2
         if action == 0:
             self.acceleration += 100000 * h
         elif action == 1:
@@ -161,7 +162,7 @@ class Car:
             end_state = True
             print(self.position[0])
             print(self.position[1])
-            reward = -10
+            reward = -100
         else:
             if action == 0:
                 reward = self.additional_reward_calculation()
@@ -173,6 +174,7 @@ class Car:
         self.position[1] = 0;
         self.velocity[0] = 0;
         self.velocity[1] = 0;
+        self.rewards = [RewardGate(7,0,7,7),RewardGate(1,0,4,7), RewardGate(33,0,7,7), RewardGate(33,10,6,6), RewardGate(20,12,7,7)]
         state = [self.position[0], self.position[1], self.velocity[0], self.velocity[1]]
         return state
 
