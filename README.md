@@ -43,9 +43,6 @@ Wich are two second degree differential equations solving the angle theta with r
 <a href="https://www.codecogs.com/eqnedit.php?latex=y(n&plus;1)&space;=&space;y(n)&space;&plus;&space;h&space;\cdot&space;F(y(n),&space;t)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?y(n&plus;1)&space;=&space;y(n)&space;&plus;&space;h&space;\cdot&space;F(y(n),&space;t)" title="y(n+1) = y(n) + h \cdot F(y(n), t)" /></a>
 
 
-## Snake Game
-
-
 ## Car Game
 The rules of the car game is easy, a car is being controlled with 4 different action:
 
@@ -76,15 +73,3 @@ Rewarding the system if it accesses new parts of the track. This is done by divi
 **3. Reward gates:**
 The last reward system constist of high reward spots on the map. They Give high rewards the first time the car is positioned inside its limits. The car, as usual, also gets a small reward for going forward. Also, a high negative reward for breaking boundaries. The red boxes represents *Reward Gates*:
 ![picture](images/Reward-System-3-Car-Game.PNG)
-
-# Useful Resources
-
-## Neural Network
-[Self-made network for handwritten digits](http://neuralnetworksanddeeplearning.com/chap1.html)
-
-## Q learning
-[Simple step-by-step Q algorithm](http://mnemstudio.org/path-finding-q-learning-tutorial.htm)
-
-[Indepth on using networks to estimate Q function](https://rubenfiszel.github.io/posts/rl4j/2016-08-24-Reinforcement-Learning-and-DQN.html)
-
-[Has links to more resources](https://skymind.ai/wiki/deep-reinforcement-learning#define)
