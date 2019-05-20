@@ -120,7 +120,7 @@ class Car:
             if self.rewards[i].collide(self.position[0], self.position[1]):
                 reward = 100
                 self.rewards.pop(i)
-                print("milestone reached!")
+                #print("milestone reached!")
                 break
 
         return reward
@@ -175,8 +175,6 @@ class Car:
         has_crashed = self.boundaries_check()
         if has_crashed:
             end_state = True
-            print(self.position[0])
-            print(self.position[1])
             reward = -50
         else:
               reward = self.additional_reward_calculation(reward)
