@@ -56,7 +56,7 @@ class DeepLearner(object):
         self.discount_factor = 0.95
         self.exploration_rate = 1.0
         self.exploration_min = 0.01
-        self.exploration_decay = 0.995
+        self.exploration_decay = 0.9995
         self.learning_rate = 0.001
 
         # Create Networks

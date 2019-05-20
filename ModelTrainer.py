@@ -81,15 +81,17 @@ class ModelTrainer(object):
 				if len(agent.memory) > batch_size:
 					agent.replay(batch_size)
 
-			if not done:
+			if not done: # TODO: unnessecary if here, should do stuff even if it won
 				self.training_rewards.append(total_reward)
 				self.training_times.append(time)
 				agent.update_target_network()
 				print("episode: {}/{}, time: {}, reward: {}, e: {:.2}"
 						  .format(episode, num_episodes, time, total_reward, agent.exploration_rate))
 
-		# Save the state of the model after training session is over
-		self.model.save(filename)
+			# Save the state of the model after training session is over
+			if episode % 100 == 0:
+				print("Saved agent to", filename)
+				self.model.save(filename)
 
 
 	def load_model(self, filename):
@@ -111,7 +113,7 @@ class ModelTrainer(object):
 
 
 
-trainer = ModelTrainer(SnakeGame(4))
-trainer.load_model("agents/snake_4x4.h5")
-trainer.get_training_data(10, 32, "agents/snake_4x4.h5")
+trainer = ModelTrainer(SnakeGame(6))
+trainer.load_model("agents/snake_6x6.h5")
+trainer.get_training_data(10, 32, "agents/snake_6x6.h5")
 trainer.plot_data()
