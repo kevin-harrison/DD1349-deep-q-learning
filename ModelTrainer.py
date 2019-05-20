@@ -56,7 +56,6 @@ class ModelTrainer(object):
 			done = False
 			total_reward = 0
 
-
 			for time in range(600):
 				self.game.render() # Comment out to train faster
 
@@ -117,3 +116,4 @@ trainer = ModelTrainer(SnakeGame(6))
 trainer.load_model("agents/snake_6x6.h5")
 trainer.get_training_data(10, 32, "agents/snake_6x6.h5")
 trainer.plot_data()
+
