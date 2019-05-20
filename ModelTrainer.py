@@ -112,8 +112,8 @@ class ModelTrainer(object):
 
 
 
-trainer = ModelTrainer(SnakeGame(6))
-trainer.load_model("agents/snake_6x6.h5")
-trainer.get_training_data(10, 32, "agents/snake_6x6.h5")
+trainer = ModelTrainer(Car(0,0))
+#trainer.load_model("agents/driver.h5")
+trainer.get_training_data(301, 32, "agents/driver.h5")
 trainer.plot_data()
 

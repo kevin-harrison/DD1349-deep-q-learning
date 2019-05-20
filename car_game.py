@@ -4,7 +4,7 @@ import random
 import os
 import numpy as np
 from pygame.math import Vector2
-# Visualisation of the path, indluding the track and car. 
+# Visualisation of the path, indluding the track and car.
 current_dir = os.path.dirname(os.path.abspath(__file__))
 image_path = os.path.join(current_dir, "race_car.PNG")
 image_track_path = os.path.join(current_dir, "car-track.png")
@@ -50,7 +50,7 @@ class Car:
 	acceleration, steering: double
 	         The current acceleration and steering/turning of the car.
 	break_deceleration:
-	         The breaking force. 
+	         The breaking force.
 	"""
     def __init__(self, x, y):
         """
@@ -62,6 +62,8 @@ class Car:
             The intial y-coordinate position of the car.
         """
         # Car position and characteristics
+        self.start_x = x
+        self.start_y = y
         self.position = Vector2(x,y)
         self.velocity = Vector2(0.0,0.0)
         self.angle = 0.0
@@ -74,7 +76,7 @@ class Car:
         self.steering = 0.0
         self.brake_deceleration = 1000
         # Rewards positioning.
-        self.rewards = [RewardGate(7,0,7,7),RewardGate(1,0,4,7),RewardGate(4,0,4,7), RewardGate(6,0,4,7), RewardGate(33,0,7,7), RewardGate(10,0,7,7), RewardGate(20,0,4,7), RewardGate(33,10,6,6), RewardGate(33,15,6,6), RewardGate(20,16,6,6)]
+        self.rewards = [RewardGate(7,0,7,7),RewardGate(10,0,4,7),RewardGate(13,0,4,7), RewardGate(16,0,4,7), RewardGate(33,0,7,7), RewardGate(10,0,7,7), RewardGate(20,0,4,7), RewardGate(33,10,6,6), RewardGate(33,15,6,6), RewardGate(20,16,6,6)]
         # Ratio for transforming force of the vector2 to pixels on the screen.
         self.ratiopixels = 0.026
         #Interaction with the q-learning  algorithm.
@@ -109,14 +111,14 @@ class Car:
             broken_limit = True
 
         return broken_limit
-    
+
     def additional_reward_calculation(self, reward):
         #Provides rewards if the car reaches a reward gate, only ones though for each gate.
-        
+
         for i in range(len(self.rewards)):
 
             if self.rewards[i].collide(self.position[0], self.position[1]):
-                reward = 1000
+                reward = 100
                 self.rewards.pop(i)
                 print("milestone reached!")
                 break
@@ -130,9 +132,9 @@ class Car:
         rotated = pygame.transform.rotate(car_image, self.angle)
         rect = rotated.get_rect()
         screen.blit(rotated, self.position * ppu - (rect.width / 2, rect.height / 2))
-       # for gate in self.rewards:
-        #    pygame.draw.rect(screen, (244, 66, 66), pygame.Rect(gate.x/self.ratiopixels, gate.y/self.ratiopixels, gate.x_length/self.ratiopixels, gate.y_length/self.ratiopixels))
-        pygame.display.update() 
+        for gate in self.rewards:
+            pygame.draw.rect(screen, (244, 66, 66), pygame.Rect(gate.x/self.ratiopixels, gate.y/self.ratiopixels, gate.x_length/self.ratiopixels, gate.y_length/self.ratiopixels))
+        pygame.display.update()
 
     def step(self, action):
     # actions: 0 = forward, 1 = brake, 2 = left turn, 3 = right turn.
@@ -140,12 +142,12 @@ class Car:
     # Reward is initialy only given for forward movement.
         h =0.017
         end_state = False
-        reward = None
+        reward = -1
         if action == 0:
             self.acceleration += 100000 * h
-            reward = 10
+
         elif action == 1:
-            reward = -10
+
             if self.velocity.x > 1000 * self.brake_deceleration:
                 # Switches the value to the opposite of its direction.
                 self.acceleration = -copysign(self.brake_deceleration, self.velocity.x)
@@ -159,17 +161,17 @@ class Car:
                     self.acceleration = -self.velocity.x / h
                     self.acceleration = max(-self.max_acceleration, min(self.acceleration, self.max_acceleration))
         if action == 2:
-            reward = -1
+
             self.steering -= 30000 * h
         elif action == 3:
-            reward = -1
+
             self.steering += 30000 * h
         else:
             self.steering = 0
         self.steering = max(-self.max_steering, min(self.steering, self.max_steering))
         # Physical consequence of the given action.
         next_state = self.action(h)
-        # Checks to see if crash has taken place and if reward gate is reached. 
+        # Checks to see if crash has taken place and if reward gate is reached.
         has_crashed = self.boundaries_check()
         if has_crashed:
             end_state = True
@@ -183,8 +185,17 @@ class Car:
 
     def reset(self):
         # Upon crashing, the game can be reset with proper intial conditions (position, velocity, rewards).
-        self.position[0] = 0;
-        self.position[1] = 0;
+        self.angle = 0.0
+        self.length = 4
+        self.max_acceleration = 5.0
+        self.max_steering = 40
+        self.max_velocity = 30
+        self.free_deceleration = 2
+        self.acceleration = 0.0
+        self.steering = 0.0
+        self.brake_deceleration = 1000
+        self.position[0] = self.start_x;
+        self.position[1] = self.start_y;
         self.velocity[0] = 0;
         self.velocity[1] = 0;
         self.rewards = [RewardGate(7,0,7,7),RewardGate(1,0,4,7),RewardGate(4,0,4,7), RewardGate(6,0,4,7), RewardGate(33,0,7,7), RewardGate(10,0,7,7), RewardGate(20,0,4,7), RewardGate(33,10,6,6), RewardGate(33,15,6,6), RewardGate(20,16,6,6)]
