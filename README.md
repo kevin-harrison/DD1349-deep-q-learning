@@ -54,7 +54,7 @@ The rules of the car game is easy, a car is being controlled with 4 different ac
 - **Left turn**: Turn car to the left.
 - **Brake**: Gives a velocity opposite direction of velocity.
 
-The more in-depth physics has inspiration from [the following implementation](http://rmgi.blog/pygame-2d-car-tutorial.html) and is also explained in-code.
+OBS! The more in-depth physics in this game was inspired by [the following implementation](http://rmgi.blog/pygame-2d-car-tutorial.html) and is also explained in-code.
 
 The track of the car has a rectangular shape with a patch of grass in its center. The goal of the car-game is to drive around the course without breaking the canvas or grass limits.
 
