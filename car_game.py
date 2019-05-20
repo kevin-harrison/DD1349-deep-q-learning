@@ -132,8 +132,8 @@ class Car:
         rotated = pygame.transform.rotate(car_image, self.angle)
         rect = rotated.get_rect()
         screen.blit(rotated, self.position * ppu - (rect.width / 2, rect.height / 2))
-        for gate in self.rewards:
-            pygame.draw.rect(screen, (244, 66, 66), pygame.Rect(gate.x/self.ratiopixels, gate.y/self.ratiopixels, gate.x_length/self.ratiopixels, gate.y_length/self.ratiopixels))
+        #for gate in self.rewards:
+        #    pygame.draw.rect(screen, (244, 66, 66), pygame.Rect(gate.x/self.ratiopixels, gate.y/self.ratiopixels, gate.x_length/self.ratiopixels, gate.y_length/self.ratiopixels))
         pygame.display.update()
 
     def step(self, action):
